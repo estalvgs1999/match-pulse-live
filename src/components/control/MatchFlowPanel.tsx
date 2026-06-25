@@ -41,7 +41,7 @@ export interface MatchFlowPanelProps {
 }
 
 const GRAPHIC_STEPS: Array<{ graphic: ActiveGraphic; label: string; icon: string }> = [
-  { graphic: "bug", label: "Scoreboard", icon: "scoreboard" },
+  { graphic: "bug", label: "Score", icon: "scoreboard" },
   { graphic: "htft", label: "HT / FT", icon: "campaign" },
   { graphic: "prematch", label: "Pre-Match", icon: "sports" },
   { graphic: "lineups", label: "Lineups", icon: "groups" },
@@ -289,7 +289,7 @@ export function MatchFlowPanel({
                 <button
                   key={step.graphic}
                   type="button"
-                  onClick={() => onSelectGraphic(step.graphic)}
+                  onClick={() => onSelectGraphic(activeGraphic === step.graphic ? "none" : step.graphic)}
                   className={`flex flex-col items-center gap-1.5 p-3 md:p-4 rounded-xl border transition-all ${
                     isActive
                       ? "border-tertiary bg-tertiary-container text-tertiary-fixed-dim active-glow-tertiary"

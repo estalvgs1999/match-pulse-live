@@ -33,6 +33,7 @@
   box-sizing: border-box;
   opacity: 0;
   transition: opacity 0.3s ease;
+  transition-delay: 0.04s;
 }
 
 .redCardsContainerVisible {
@@ -73,6 +74,7 @@
   opacity: 0;
   transform: translateX(-140px);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  transition-delay: 0.16s;
 }
 
 .timePanelVisible {
@@ -107,6 +109,7 @@
   opacity: 0;
   transform: translate(-50%, 10px);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  transition-delay: 0.06s;
 }
 
 .aggregateTabVisible {
@@ -262,6 +265,7 @@
   opacity: 0;
   transform: scale(0.85) translateY(-30px);
   transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+  transition-delay: 0.08s;
 }
 
 .mainBarVisible {

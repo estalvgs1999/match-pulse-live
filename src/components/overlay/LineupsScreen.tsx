@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import styles from "./LineupsScreen.module.css";
 import { DEFAULT_TEAM_LOGO } from "@/components/shared/defaultLogo";
 import { DEFAULT_PLAYER_PORTRAIT } from "@/components/shared/defaultPortrait";
@@ -106,6 +106,29 @@ function PlayerRow({
   );
 }
 
+// When the displayed team changes while the screen is visible, briefly drives
+// the wrapper back to its hidden state so the exit CSS transition plays,
+// then releases it to re-enter with the new team's data and a fresh intro scan.
+function useTeamCycle(visible: boolean, teamId: string): boolean {
+  const [cycling, setCycling] = useState(false);
+  const prevId = useRef(teamId);
+
+  useEffect(() => {
+    if (!visible) {
+      prevId.current = teamId;
+      setCycling(false);
+      return;
+    }
+    if (prevId.current === teamId) return;
+    prevId.current = teamId;
+    setCycling(true);
+    const t = setTimeout(() => setCycling(false), 440);
+    return () => clearTimeout(t);
+  }, [teamId, visible]);
+
+  return cycling;
+}
+
 // Intro "spotlight scan": once the screen becomes visible, walks the
 // current-player highlight through the whole roster (starting, then
 // bench) one at a time, then settles on no one highlighted — an
@@ -149,6 +172,11 @@ export function LineupsScreen({
   captainNumber,
   currentPlayerNumber,
 }: LineupsScreenProps) {
+  const teamId = team?._id ?? team?.slug ?? team?.name ?? "";
+  const cycling = useTeamCycle(visible, teamId);
+  // While cycling, suppress visible so the CSS transition plays exit → enter.
+  const effectiveVisible = visible && !cycling;
+
   const roster = team?.roster ?? [];
   // Falls back to the first five roster entries so the screen never shows
   // an empty "Starting 5" if the operator hasn't configured a lineup yet —
@@ -158,7 +186,8 @@ export function LineupsScreen({
   const bench = roster.filter((p) => !effectiveStarting.includes(p.number));
   const rosterOrder = [...starting, ...bench];
 
-  const scanPlayer = useIntroScan(visible, rosterOrder);
+  // Pass effectiveVisible so the intro scan resets and replays for the new team.
+  const scanPlayer = useIntroScan(effectiveVisible, rosterOrder);
   // Once the intro scan finishes it rests on "no one" rather than falling
   // back to captain/first-starting — the operator's explicit spotlight
   // pick (if any) is still respected, it just isn't a forced default.
@@ -187,7 +216,7 @@ export function LineupsScreen({
   } as CSSProperties;
 
   return (
-    <div className={cx(styles.wrapper, visible && styles.wrapperVisible)} style={colorVars}>
+    <div className={cx(styles.wrapper, effectiveVisible && styles.wrapperVisible)} style={colorVars}>
       <div className={styles.header}>
         <div
           className={styles.logoWrapper}
@@ -203,7 +232,7 @@ export function LineupsScreen({
         <div className={styles.shape2} />
         <div className={styles.shape3} />
 
-        <div className={cx(styles.spotlightColumn, visible && styles.spotlightColumnVisible)}>
+        <div className={cx(styles.spotlightColumn, effectiveVisible && styles.spotlightColumnVisible)}>
           <img
             className={styles.portrait}
             src={currentPlayer?.portraitUrl || DEFAULT_PLAYER_PORTRAIT}
@@ -212,7 +241,7 @@ export function LineupsScreen({
         </div>
 
         <div className={styles.rosterColumn}>
-          <h3 className={cx(styles.sectionLabel, visible && styles.sectionLabelVisible)}>Starting 5</h3>
+          <h3 className={cx(styles.sectionLabel, effectiveVisible && styles.sectionLabelVisible)}>Starting 5</h3>
           <div className={styles.rowList}>
             {starting.map((player, i) => (
               <PlayerRow
@@ -220,7 +249,7 @@ export function LineupsScreen({
                 player={player}
                 isCaptain={player.number === captainNumber}
                 isCurrent={player.number === effectiveCurrentNumber}
-                visible={visible}
+                visible={effectiveVisible}
                 delay={0.1 + i * ROW_STAGGER_S}
               />
             ))}
@@ -229,8 +258,8 @@ export function LineupsScreen({
           {bench.length > 0 && (
             <>
               <h3
-                className={cx(styles.sectionLabel, styles.benchLabel, visible && styles.sectionLabelVisible)}
-                style={{ transitionDelay: visible ? `${0.1 + starting.length * ROW_STAGGER_S}s` : "0s" }}
+                className={cx(styles.sectionLabel, styles.benchLabel, effectiveVisible && styles.sectionLabelVisible)}
+                style={{ transitionDelay: effectiveVisible ? `${0.1 + starting.length * ROW_STAGGER_S}s` : "0s" }}
               >
                 Bench
               </h3>
@@ -248,7 +277,7 @@ export function LineupsScreen({
                           player={player}
                           isCaptain={player.number === captainNumber}
                           isCurrent={player.number === effectiveCurrentNumber}
-                          visible={visible}
+                          visible={effectiveVisible}
                           delay={0.15 + (starting.length + colIndex * column.length + i) * ROW_STAGGER_S}
                         />
                       ))}
