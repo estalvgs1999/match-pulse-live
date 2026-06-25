@@ -58,7 +58,7 @@
   right: -135px;
   width: 160px;
   height: 50px;
-  background-color: #111916;
+  background-color: #1c2a1c;
   border-radius: 0 25px 25px 0;
   z-index: 5;
   display: flex;
@@ -147,7 +147,7 @@
   left: 50%;
   width: 464px;
   height: 60px;
-  background-color: #0f110f;
+  background-color: #161e16;
   border-radius: 0 0 12px 12px;
   z-index: 4;
   display: flex;
@@ -175,7 +175,7 @@
   left: 470px;
   width: 160px;
   height: 60px;
-  background-color: #0f110f;
+  background-color: #161e16;
   border-radius: 0 30px 30px 0;
   z-index: 3;
   display: flex;

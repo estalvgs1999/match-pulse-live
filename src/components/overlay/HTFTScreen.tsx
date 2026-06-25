@@ -24,6 +24,13 @@ function cx(...classes: Array<string | false | undefined>): string {
   return classes.filter(Boolean).join(" ");
 }
 
+function toRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function ScorerList({ text }: { text: string }) {
   const lines = text.split("\n").filter((line) => line.trim() !== "");
   return (
@@ -49,7 +56,16 @@ export function HTFTScreen({
     <div className={cx(styles.wrapper, visible && styles.wrapperVisible)}>
       <div className={cx(styles.tag, visible && styles.tagVisible)}>{title}</div>
 
-      <div className={cx(styles.main, visible && styles.mainVisible)}>
+      <div
+        className={cx(styles.main, visible && styles.mainVisible)}
+        style={{
+          background: [
+            `radial-gradient(ellipse 55% 160% at 6% 50%, ${toRgba(homeTeam.color, 0.16)} 0%, transparent 58%)`,
+            `radial-gradient(ellipse 55% 160% at 94% 50%, ${toRgba(awayTeam.color, 0.16)} 0%, transparent 58%)`,
+            "#0c120e",
+          ].join(", "),
+        }}
+      >
         <div className={cx(styles.team, styles.teamLeft)}>
           <div
             className={styles.logoWrapper}
