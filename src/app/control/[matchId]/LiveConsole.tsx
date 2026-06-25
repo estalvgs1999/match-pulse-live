@@ -18,10 +18,7 @@ import { countMade } from "@/lib/format";
 
 const NAV_ITEMS = [
   { icon: "dashboard", label: "Dashboard", active: false, href: "/dashboard" },
-  { icon: "sports_score", label: "Match Control", active: true, href: null },
-  { icon: "layers", label: "Overlay Manager", active: false, href: null },
-  { icon: "rss_feed", label: "Data Streams", active: false, href: null },
-  { icon: "groups", label: "Team Database", active: false, href: null },
+  { icon: "groups", label: "Teams", active: false, href: "/dashboard/teams" },
 ];
 
 export function LiveConsole({ matchId }: { matchId: string }) {
@@ -313,13 +310,6 @@ export function LiveConsole({ matchId }: { matchId: string }) {
           ))}
         </nav>
         <div className="mt-auto pt-4 space-y-1 border-t border-outline-variant">
-          <a
-            href="#"
-            className="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg group"
-          >
-            <span className="material-symbols-outlined text-xl">memory</span>
-            <span className="font-body text-sm">System Health</span>
-          </a>
           <button
             type="button"
             onClick={handleLogout}
@@ -363,13 +353,6 @@ export function LiveConsole({ matchId }: { matchId: string }) {
               ))}
             </nav>
             <div className="mt-auto pt-4 space-y-1 border-t border-outline-variant">
-              <a
-                href="#"
-                className="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg group"
-              >
-                <span className="material-symbols-outlined text-xl">memory</span>
-                <span className="font-body text-sm">System Health</span>
-              </a>
               <button
                 type="button"
                 onClick={handleLogout}

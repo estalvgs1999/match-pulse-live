@@ -139,10 +139,7 @@ function SkeletonCard() {
 
 const NAV_ITEMS = [
   { icon: "dashboard", label: "Dashboard", key: "dashboard" },
-  { icon: "sports_score", label: "Match Control", key: "control" },
-  { icon: "layers", label: "Overlay Manager", key: "overlay" },
-  { icon: "rss_feed", label: "Data Streams", key: "streams" },
-  { icon: "groups", label: "Team Database", key: "teams" },
+  { icon: "groups", label: "Teams", key: "teams" },
 ];
 
 export function TeamsClient() {
@@ -190,12 +187,7 @@ export function TeamsClient() {
   function handleNavAction(key: string) {
     setMobileNavOpen(false);
     if (key === "dashboard") { router.push("/dashboard"); return; }
-    if (key === "teams") { router.push("/dashboard/teams"); return; }
-    if (key === "control" || key === "overlay" || key === "streams") {
-      showToast("Navega desde el Dashboard para acceder a esa sección.");
-      return;
-    }
-    showToast("Próximamente — esta sección está en desarrollo.");
+    if (key === "teams") { router.push("/dashboard/teams"); }
   }
 
   async function handleLogout() {
@@ -233,14 +225,6 @@ export function TeamsClient() {
 
   const sidebarFooter = (
     <div className="mt-auto pt-4 space-y-1 border-t border-outline-variant">
-      <button
-        type="button"
-        onClick={() => showToast("System Health — próximamente.")}
-        className="w-full flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg group text-left"
-      >
-        <span className="material-symbols-outlined text-xl">memory</span>
-        <span className="font-body text-sm">System Health</span>
-      </button>
       <button
         type="button"
         onClick={handleLogout}
