@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import styles from "./StatsScreen.module.css";
 import { DEFAULT_TEAM_LOGO } from "@/components/shared/defaultLogo";
 import type { TeamStats } from "@/models/MatchState";
@@ -30,8 +31,7 @@ function cx(...classes: Array<string | false | undefined>): string {
   return classes.filter(Boolean).join(" ");
 }
 
-// A comparison row: value | label | value, with a proportional bar behind
-// the two values so the split reads at a glance, not just as numbers.
+// A comparison row: value | bar | value | label
 function StatRow({
   label,
   home,
@@ -40,7 +40,7 @@ function StatRow({
   awayColor,
   format = (n: number) => String(n),
 }: {
-  label: string;
+  label: ReactNode;
   home: number;
   away: number;
   homeColor: string;
@@ -57,7 +57,50 @@ function StatRow({
         <div className={styles.statBarAway} style={{ width: `${100 - homePct}%`, backgroundColor: awayColor }} />
       </div>
       <span className={styles.statValue}>{format(away)}</span>
-      <span className={styles.statLabel}>{label}</span>
+      {typeof label === "string" ? (
+        <span className={styles.statLabel}>{label}</span>
+      ) : (
+        label
+      )}
+    </div>
+  );
+}
+
+// Cards row — shows yellow/red split as "Y/R" with colored chip icons in
+// the label column so the operator can read at a glance which number is which.
+function CardsRow({
+  homeYellow,
+  homeRed,
+  awayYellow,
+  awayRed,
+  homeColor,
+  awayColor,
+}: {
+  homeYellow: number;
+  homeRed: number;
+  awayYellow: number;
+  awayRed: number;
+  homeColor: string;
+  awayColor: string;
+}) {
+  const homeTotal = homeYellow + homeRed;
+  const awayTotal = awayYellow + awayRed;
+  const total = homeTotal + awayTotal || 1;
+  const homePct = (homeTotal / total) * 100;
+  return (
+    <div className={styles.statRow}>
+      <span className={styles.statValue}>{homeYellow}/{homeRed}</span>
+      <div className={styles.statBarTrack}>
+        <div className={styles.statBarHome} style={{ width: `${homePct}%`, backgroundColor: homeColor }} />
+        <div className={styles.statBarAway} style={{ width: `${100 - homePct}%`, backgroundColor: awayColor }} />
+      </div>
+      <span className={styles.statValue}>{awayYellow}/{awayRed}</span>
+      <div className={styles.cardLabelContent}>
+        <span className={`${styles.cardChip} ${styles.cardChipYellow}`} />
+        <span className={styles.cardChipSep}>/</span>
+        <span className={`${styles.cardChip} ${styles.cardChipRed}`} />
+        <span className={styles.statLabel}>Cards</span>
+      </div>
     </div>
   );
 }
@@ -133,10 +176,11 @@ export function StatsScreen({
           awayColor={awayTeam.color}
         />
         <StatRow label="Fouls" home={homeFouls} away={awayFouls} homeColor={homeTeam.color} awayColor={awayTeam.color} />
-        <StatRow
-          label="Cards"
-          home={homeYellowCards + homeRedCards}
-          away={awayYellowCards + awayRedCards}
+        <CardsRow
+          homeYellow={homeYellowCards}
+          homeRed={homeRedCards}
+          awayYellow={awayYellowCards}
+          awayRed={awayRedCards}
           homeColor={homeTeam.color}
           awayColor={awayTeam.color}
         />

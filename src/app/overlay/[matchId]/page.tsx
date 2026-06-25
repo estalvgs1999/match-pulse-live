@@ -101,8 +101,8 @@ export default function OverlayPage({
       />
       <StatsScreen
         visible={state.activeGraphic === "stats"}
-        homeTeam={homeTeam}
-        awayTeam={awayTeam}
+        homeTeam={homeTeamFull}
+        awayTeam={awayTeamFull}
         homeScore={state.homeScore}
         awayScore={state.awayScore}
         homeFouls={state.homeFouls}

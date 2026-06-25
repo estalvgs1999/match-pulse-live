@@ -142,3 +142,33 @@
   text-transform: uppercase;
   text-align: right;
 }
+
+/* Card label: colored chip icons + slash + label text, right-aligned */
+.cardLabelContent {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.cardChip {
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.cardChipYellow {
+  background-color: #f5c518;
+}
+
+.cardChipRed {
+  background-color: #ff2222;
+}
+
+.cardChipSep {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
