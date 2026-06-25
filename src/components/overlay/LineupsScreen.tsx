@@ -4,6 +4,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import styles from "./LineupsScreen.module.css";
 import { DEFAULT_TEAM_LOGO } from "@/components/shared/defaultLogo";
 import { DEFAULT_PLAYER_PORTRAIT } from "@/components/shared/defaultPortrait";
+import { readableTextColor, dimTextColor } from "@/lib/contrast";
 import type { RosterPlayer, Team } from "@/models/Team";
 
 export interface LineupsScreenProps {
@@ -167,7 +168,23 @@ export function LineupsScreen({
   const accent = team?.colors.accent ?? "#67f58b";
   const primary = team?.colors.primary ?? "#134024";
   const dark = darken(primary, 0.4);
-  const colorVars = { "--lineup-accent": accent, "--lineup-primary": primary, "--lineup-dark": dark } as CSSProperties;
+  // Header gradient runs accent → primary; check accent (lighter stop) so
+  // text stays readable even when a team uses a bright/light accent color.
+  const headerText = readableTextColor(accent);
+  const headerTextDim = dimTextColor(accent);
+  // Body gradient runs accent → primary → dark; most text sits on the
+  // primary/dark half, so check primary for the body text decision.
+  const bodyText = readableTextColor(primary);
+  const bodyTextDim = dimTextColor(primary);
+  const colorVars = {
+    "--lineup-accent": accent,
+    "--lineup-primary": primary,
+    "--lineup-dark": dark,
+    "--lineup-header-text": headerText,
+    "--lineup-header-text-dim": headerTextDim,
+    "--lineup-body-text": bodyText,
+    "--lineup-body-text-dim": bodyTextDim,
+  } as CSSProperties;
 
   return (
     <div className={cx(styles.wrapper, visible && styles.wrapperVisible)} style={colorVars}>
