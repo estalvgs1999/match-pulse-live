@@ -285,11 +285,31 @@ export function MatchFlowPanel({
           <div className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 mb-3">
             {GRAPHIC_STEPS.map((step) => {
               const isActive = activeGraphic === step.graphic;
+
+              function handleGraphicClick() {
+                // Active → deactivate (toggle off)
+                if (isActive) {
+                  onSelectGraphic("none");
+                  return;
+                }
+                // Standings / stats open their editor first; the modal's
+                // "Mostrar en pantalla" button activates the graphic.
+                if (step.graphic === "standings") {
+                  onOpenStandingsEditor();
+                  return;
+                }
+                if (step.graphic === "stats") {
+                  onOpenStatsEditor();
+                  return;
+                }
+                onSelectGraphic(step.graphic);
+              }
+
               return (
                 <button
                   key={step.graphic}
                   type="button"
-                  onClick={() => onSelectGraphic(activeGraphic === step.graphic ? "none" : step.graphic)}
+                  onClick={handleGraphicClick}
                   className={`flex flex-col items-center gap-1.5 p-3 md:p-4 rounded-xl border transition-all ${
                     isActive
                       ? "border-tertiary bg-tertiary-container text-tertiary-fixed-dim active-glow-tertiary"

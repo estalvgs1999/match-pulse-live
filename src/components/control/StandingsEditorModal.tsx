@@ -12,6 +12,8 @@ export interface StandingsEditorModalProps {
   onRowsChange: (rows: StandingsRow[]) => void;
   rounds: BracketRound[];
   onRoundsChange: (rounds: BracketRound[]) => void;
+  onGoLive?: () => void;
+  isLive?: boolean;
 }
 
 const EMPTY_ROW: StandingsRow = { team: "", played: 0, won: 0, drawn: 0, lost: 0, points: 0 };
@@ -43,6 +45,8 @@ export function StandingsEditorModal({
   onRowsChange,
   rounds,
   onRoundsChange,
+  onGoLive,
+  isLive = false,
 }: StandingsEditorModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -112,6 +116,28 @@ export function StandingsEditorModal({
             Bracket
           </button>
         </div>
+
+        {onGoLive && (
+          <div className="flex items-center justify-between mb-5 pb-5 border-b border-outline-variant">
+            <span className="text-xs text-on-surface-variant">
+              {isLive ? "Graphic is on air" : "Configure data, then send to overlay"}
+            </span>
+            <button
+              type="button"
+              onClick={() => { onGoLive(); onClose(); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
+                isLive
+                  ? "border border-tertiary bg-tertiary-container text-tertiary-fixed-dim active-glow-tertiary"
+                  : "bg-tertiary text-on-tertiary hover:opacity-90"
+              }`}
+            >
+              <span className="material-symbols-outlined text-sm">
+                {isLive ? "sensors" : "play_circle"}
+              </span>
+              {isLive ? "En Aire" : "Mostrar en pantalla"}
+            </button>
+          </div>
+        )}
 
         {format === "league" ? (
           <div className="space-y-2">

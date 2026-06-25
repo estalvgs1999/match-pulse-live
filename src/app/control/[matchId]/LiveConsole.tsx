@@ -599,6 +599,8 @@ export function LiveConsole({ matchId }: { matchId: string }) {
         onRowsChange={(rows) => patch({ standingsRows: rows })}
         rounds={state.bracketRounds}
         onRoundsChange={(rounds) => patch({ bracketRounds: rounds })}
+        onGoLive={() => patch({ activeGraphic: "standings" })}
+        isLive={state.activeGraphic === "standings"}
       />
 
       <StatsEditorModal
@@ -613,6 +615,8 @@ export function LiveConsole({ matchId }: { matchId: string }) {
             ? patch({ homeStats: { ...state.homeStats, ...statsPatch } })
             : patch({ awayStats: { ...state.awayStats, ...statsPatch } })
         }
+        onGoLive={() => patch({ activeGraphic: "stats" })}
+        isLive={state.activeGraphic === "stats"}
       />
     </div>
   );
