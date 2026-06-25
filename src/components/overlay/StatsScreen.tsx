@@ -81,7 +81,10 @@ export function StatsScreen({
     <div className={cx(styles.wrapper, visible && styles.wrapperVisible)}>
       <div className={styles.header}>
         <div className={styles.headerTeam}>
-          <div className={styles.logoWrapper}>
+          <div
+            className={styles.logoWrapper}
+            style={{ borderColor: homeTeam.color, boxShadow: `0 0 12px ${homeTeam.color}55` }}
+          >
             <img src={homeTeam.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
           </div>
           <span className={styles.headerTeamName}>{homeTeam.name}</span>
@@ -89,7 +92,10 @@ export function StatsScreen({
         <span className={styles.headerLabel}>Match Stats</span>
         <div className={cx(styles.headerTeam, styles.headerTeamRight)}>
           <span className={styles.headerTeamName}>{awayTeam.name}</span>
-          <div className={styles.logoWrapper}>
+          <div
+            className={styles.logoWrapper}
+            style={{ borderColor: awayTeam.color, boxShadow: `0 0 12px ${awayTeam.color}55` }}
+          >
             <img src={awayTeam.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
           </div>
         </div>

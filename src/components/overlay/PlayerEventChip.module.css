@@ -1,23 +1,21 @@
-/* Lower-third chip below the scorebug — same green/black/white family,
-   not a one-off design. Goal: colored team-accent edge + "GOAL" tag.
-   Red card: a small card-shaped icon that flips in on its own axis. */
+/* Lower-third player event chip — appears below the scorebug for goals,
+   red cards, yellow cards. Colors unified with the new overlay design
+   language: near-black card (#0c120e) with border. Layout unchanged. */
 
 .wrapper {
   position: absolute;
-  /* A clearly visible gap below the green bar (mainBar is 66px tall) —
-     78px (12px gap) still read as glued-on; 90px (24px gap) gives real
-     breathing room without floating away from the scoreboard. */
   top: 90px;
   left: 0;
   width: 380px;
   height: 54px;
-  background-color: #18181a;
+  background-color: #0c120e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 10px;
   z-index: 6;
   display: flex;
   align-items: stretch;
   box-sizing: border-box;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
   opacity: 0;
   transform: translate(-24px, 0);
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
@@ -29,6 +27,7 @@
   transform: translate(0, 0);
 }
 
+/* Goal badge — backgroundColor set via inline style (team color) */
 .badge {
   width: 64px;
   flex-shrink: 0;
@@ -58,7 +57,7 @@
 .cardIcon {
   width: 22px;
   height: 30px;
-  background-color: #ff0000;
+  background-color: #ff2222;
   border-radius: 3px;
   animation: cardFlip 0.5s ease-out;
 }

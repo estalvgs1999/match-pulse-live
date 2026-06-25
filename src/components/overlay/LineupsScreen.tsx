@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import styles from "./LineupsScreen.module.css";
-import { DEFAULT_TEAM_LOGO_DARK } from "@/components/shared/defaultLogo";
+import { DEFAULT_TEAM_LOGO } from "@/components/shared/defaultLogo";
 import { DEFAULT_PLAYER_PORTRAIT } from "@/components/shared/defaultPortrait";
 import type { RosterPlayer, Team } from "@/models/Team";
 
@@ -172,8 +172,11 @@ export function LineupsScreen({
   return (
     <div className={cx(styles.wrapper, visible && styles.wrapperVisible)} style={colorVars}>
       <div className={styles.header}>
-        <div className={styles.logoWrapper}>
-          <img src={team?.logoUrl || DEFAULT_TEAM_LOGO_DARK} alt="" />
+        <div
+          className={styles.logoWrapper}
+          style={{ borderColor: accent, boxShadow: `0 0 16px ${accent}50` }}
+        >
+          <img src={team?.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
         </div>
         <span className={styles.teamName}>{team?.name ?? ""}</span>
       </div>

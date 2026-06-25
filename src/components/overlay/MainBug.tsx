@@ -198,7 +198,10 @@ export function MainBug({
             className={cx(styles.dot, styles.dotActive)}
             style={{ backgroundColor: homeTeam.color, color: homeTeam.color }}
           />
-          <div className={styles.logoWrapper}>
+          <div
+            className={styles.logoWrapper}
+            style={{ borderColor: homeTeam.color, boxShadow: `0 0 10px ${homeTeam.color}60` }}
+          >
             <img src={homeTeam.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
           </div>
           <span className={styles.teamName}>{homeTeam.name}</span>
@@ -212,7 +215,10 @@ export function MainBug({
 
         <div className={cx(styles.teamGroup, styles.teamGroupRight)}>
           <span className={styles.teamName}>{awayTeam.name}</span>
-          <div className={styles.logoWrapper}>
+          <div
+            className={styles.logoWrapper}
+            style={{ borderColor: awayTeam.color, boxShadow: `0 0 10px ${awayTeam.color}60` }}
+          >
             <img src={awayTeam.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
           </div>
           <div

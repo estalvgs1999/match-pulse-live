@@ -1,11 +1,7 @@
-/* Ported from scores.html — dimensions, colors, cubic-beziers and
-   transition-delays kept verbatim, repositioned to the top-left corner
-   (standard broadcast soccer-bug placement) instead of top-center. Sizing
-   was calibrated against a reference screenshot: its bug measured ~5.9% of
-   1920x1080 screen height, which is what the original scores.html scale
-   (500x66, ~6.1%) already matched — an earlier 0.68x shrink overshot to
-   ~4.2% and is reverted here. transform/opacity only, so it stays
-   compositor-cheap inside OBS's CEF. */
+/* Scoreboard bug — top-left corner, broadcast standard placement.
+   Colors unified with the new overlay design language: near-black body
+   (#0c120e), team-color logo rings (via inline style), green accent for
+   period label. Shadow/sizing/animation logic kept from original. */
 
 .scoreboardWrapper {
   position: absolute;
@@ -27,11 +23,6 @@
 
 .redCardsContainer {
   position: absolute;
-  /* Overlaps the green bar's top edge on purpose — z-index below .mainBar
-     means the bar's own background clips the bottom half of each icon, so
-     cards look like they're tucked behind the scoreboard and poking out
-     above it, cut off where they meet the bar (same family of trick as
-     .timePanel/.bottomBar tucking behind .mainBar). */
   top: -9px;
   left: 0;
   width: 100%;
@@ -67,7 +58,7 @@
   right: -135px;
   width: 160px;
   height: 50px;
-  background-color: #ffffff;
+  background-color: #111916;
   border-radius: 0 25px 25px 0;
   z-index: 5;
   display: flex;
@@ -76,7 +67,9 @@
   padding-right: 22px;
   gap: 12px;
   box-sizing: border-box;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: none;
   opacity: 0;
   transform: translateX(-140px);
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -91,24 +84,17 @@
 .periodText {
   font-size: 16px;
   font-weight: 800;
-  color: #000000;
+  color: #67f58b;
   margin: 0;
 }
 
-/* Two-leg aggregate score — a centered tab poking above the bar. Sits in
-   the only genuinely free real estate above the bug: red cards pin to the
-   left/right edges of that same strip, so a centered tab doesn't compete
-   with them. z-index BELOW .mainBar (same tuck-behind family as
-   .redCardsContainer/.timePanel/.bottomBar) so the bar's top edge clips
-   its bottom ~8px — it reads as anchored behind the bar, not floating in
-   front of it. */
 .aggregateTab {
   position: absolute;
   top: -22px;
   left: 50%;
   min-width: 130px;
   height: 30px;
-  background-color: #18181a;
+  background-color: #111916;
   border-radius: 10px 10px 0 0;
   z-index: 9;
   display: flex;
@@ -149,7 +135,7 @@
 .timeText {
   font-size: 22px;
   font-weight: 700;
-  color: #000000;
+  color: #ffffff;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.5px;
   margin: 0;
@@ -160,11 +146,8 @@
   top: 50px;
   left: 50%;
   width: 464px;
-  /* Taller than scores.html's original 38px, and the pills/dots/label
-     inside are sized up too (see below) — at the old sizes this bar had a
-     lot of unused space, looking sparse relative to its own footprint. */
   height: 60px;
-  background-color: #18181a;
+  background-color: #0f110f;
   border-radius: 0 0 12px 12px;
   z-index: 4;
   display: flex;
@@ -172,11 +155,6 @@
   justify-content: center;
   gap: 36px;
   box-sizing: border-box;
-  /* The top 16px of this bar sits behind the green main bar (mainBar
-     covers wrapper y:0-66, this bar starts at y:50) — only the bottom 44px
-     is actually visible. Without this padding, align-items: center
-     centers content in the full 60px box, which visually rides high in
-     the 44px visible window and leaves a lopsided gap below. */
   padding-top: 16px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
   opacity: 0;
@@ -191,20 +169,13 @@
   gap: 36px;
 }
 
-/* Satellite badge attached to the fouls/penalties bar's right edge — same
-   "peeking out from behind" trick as .timePanel on the main bar, but
-   colored to read as an EXTENSION of the black bottomBar (same #18181a,
-   same family), not a clone of the white timePanel. */
 .overtimePanel {
   position: absolute;
-  /* Exact same top/height as .bottomBar (not just an equal value floating
-     elsewhere) so it occupies the identical vertical span — same hidden
-     16px tucked behind .mainBar, same 44px visible window. */
   top: 50px;
   left: 470px;
   width: 160px;
   height: 60px;
-  background-color: #18181a;
+  background-color: #0f110f;
   border-radius: 0 30px 30px 0;
   z-index: 3;
   display: flex;
@@ -279,7 +250,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #134024;
+  background-color: #0c120e;
   border-radius: 12px;
   z-index: 10;
   display: flex;
@@ -287,7 +258,7 @@
   justify-content: space-between;
   padding: 0 16px;
   box-sizing: border-box;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   opacity: 0;
   transform: scale(0.85) translateY(-30px);
   transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
@@ -299,9 +270,6 @@
   transition-delay: 0.3s;
 }
 
-/* flex: 1 (not a fixed width) so both teams get an EQUAL share of the
-   remaining space after the score box — a fixed width fit short names
-   fine but squeezed longer ones against it. */
 .teamGroup {
   display: flex;
   align-items: center;
@@ -330,14 +298,12 @@
   box-shadow: 0 0 8px currentColor;
 }
 
+/* border-color set via inline style (team color); background transparent
+   so the glow box-shadow on the ring reads cleanly without a fill fighting it */
 .logoWrapper {
-  /* mainBar is 66px tall with no vertical padding, so this is sized to
-     leave a deliberate ~9px margin top/bottom rather than maxing out the
-     bar — bigger than the original 36px, which read as undersized next to
-     the bar's own visual weight. */
   width: 48px;
   height: 48px;
-  border: 2px solid #ffffff;
+  border: 2px solid;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -345,6 +311,7 @@
   justify-content: center;
   padding: 2px;
   box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
 
@@ -367,7 +334,7 @@
 .scoreBox {
   width: 120px;
   height: 54px;
-  background-color: #0a1c11;
+  background-color: #060b07;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -394,11 +361,11 @@
 @keyframes goalImpact {
   0% {
     transform: scale(1);
-    background-color: #0a1c11;
+    background-color: #060b07;
   }
   30% {
     transform: scale(1.18);
-    background-color: #1f5932;
+    background-color: #163320;
     box-shadow: 0 0 20px #67f58b;
   }
   70% {
@@ -406,7 +373,7 @@
   }
   100% {
     transform: scale(1);
-    background-color: #0a1c11;
+    background-color: #060b07;
     box-shadow: none;
   }
 }
@@ -431,7 +398,7 @@
 .foulPill {
   width: 24px;
   height: 9px;
-  background-color: #3a3b3f;
+  background-color: #2a2c2a;
   border-radius: 4px;
   transition: all 0.2s ease;
 }

@@ -1,7 +1,7 @@
-/* Repositioned bottom-anchored, wide horizontal bar — shape/scale
-   calibrated against a broadcast reference (~90% screen width, ~26%
-   height, anchored to the bottom edge), keeping the existing green/black/
-   white palette rather than copying the reference's own brand colors. */
+/* HT/FT screen — bottom-anchored wide bar. Colors unified with the new
+   overlay design language: near-black body (#0c120e) instead of dark green,
+   team-color logo rings (applied via inline style in HTFTScreen.tsx).
+   Layout/animation/sizing unchanged. */
 
 .wrapper {
   position: absolute;
@@ -15,10 +15,7 @@
   z-index: 100;
   pointer-events: none;
   font-family: var(--font-montserrat), sans-serif;
-  /* One shared shadow for the whole tag+main+scorers shape, instead of
-     each piece casting its own — that's what made them read as separate
-     stacked blocks rather than one unit. */
-  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.6));
 }
 
 .wrapperVisible {
@@ -34,11 +31,6 @@
   border-radius: 14px 14px 0 0;
   letter-spacing: 3px;
   text-transform: uppercase;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
-  /* Higher than .main (10) on purpose: the tag drops down from above and
-     overlaps .main's top edge mid-transition (translateY 20px -> 0) — it
-     must stay in front during that overlap, like a tab sitting on top of
-     the bar, not tucked behind it. */
   z-index: 11;
   opacity: 0;
   transform: translateY(20px);
@@ -51,22 +43,17 @@
   transition-delay: 0.2s;
 }
 
-/* .main and .scorers are designed as ONE continuous block split into two
-   colors — rounded only at the outer top/bottom corners (not all four),
-   no gap between them, and a single shared drop shadow on the wrapper
-   (not a separate shadow per piece) so they read as one shape, not two
-   stacked rectangles. */
 .main {
   width: 100%;
   height: 130px;
-  background-color: #134024;
+  background-color: #0c120e;
   border-radius: 20px 20px 0 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 56px;
   box-sizing: border-box;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   z-index: 10;
   opacity: 0;
   transform: scale(0.92);
@@ -81,7 +68,7 @@
 
 .scorers {
   width: 100%;
-  background-color: #18181a;
+  background-color: #090e09;
   border-radius: 0 0 20px 20px;
   display: flex;
   justify-content: space-between;
@@ -115,10 +102,11 @@
   justify-content: flex-end;
 }
 
+/* border-color and box-shadow set via inline style (team color) */
 .logoWrapper {
   width: 80px;
   height: 80px;
-  border: 3px solid #ffffff;
+  border: 3px solid;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
@@ -126,6 +114,7 @@
   justify-content: center;
   padding: 5px;
   box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
 
@@ -148,7 +137,7 @@
 .scoreBox {
   width: 200px;
   height: 84px;
-  background-color: #0a1c11;
+  background-color: #060b07;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -169,7 +158,7 @@
 .scoreDivider {
   width: 2px;
   height: 40px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .scorerCol {
@@ -183,7 +172,7 @@
 
 .scorerColLeft {
   text-align: left;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   padding-right: 28px;
 }
 

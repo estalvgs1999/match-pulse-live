@@ -6,6 +6,7 @@ import { DEFAULT_TEAM_LOGO } from "@/components/shared/defaultLogo";
 export interface HTFTScreenTeam {
   name: string;
   logoUrl?: string;
+  color: string;
 }
 
 export interface HTFTScreenProps {
@@ -50,7 +51,10 @@ export function HTFTScreen({
 
       <div className={cx(styles.main, visible && styles.mainVisible)}>
         <div className={cx(styles.team, styles.teamLeft)}>
-          <div className={styles.logoWrapper}>
+          <div
+            className={styles.logoWrapper}
+            style={{ borderColor: homeTeam.color, boxShadow: `0 0 18px ${homeTeam.color}55` }}
+          >
             <img src={homeTeam.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
           </div>
           <span className={styles.name}>{homeTeam.name}</span>
@@ -64,7 +68,10 @@ export function HTFTScreen({
 
         <div className={cx(styles.team, styles.teamRight)}>
           <span className={styles.name}>{awayTeam.name}</span>
-          <div className={styles.logoWrapper}>
+          <div
+            className={styles.logoWrapper}
+            style={{ borderColor: awayTeam.color, boxShadow: `0 0 18px ${awayTeam.color}55` }}
+          >
             <img src={awayTeam.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
           </div>
         </div>
