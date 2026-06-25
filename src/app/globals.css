@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/*
+ * Obsidian design tokens, copied from the Stitch project
+ * "MatchPulse Live Admin Console" (projects/14501289263200053124).
+ * Used by /login, /control, and other admin screens. The overlay
+ * (broadcast graphics) does not use these — it has its own palette
+ * defined inline / in CSS Modules per scores.html.
+ */
+@theme {
+  --color-background: #09090b;
+  --color-on-background: #fafafa;
+
+  --color-surface: #0c0c0f;
+  --color-surface-dim: #0c0c0f;
+  --color-surface-bright: #18181b;
+  --color-surface-container-lowest: #09090b;
+  --color-surface-container-low: #0f0f12;
+  --color-surface-container: #121215;
+  --color-surface-container-high: #18181b;
+  --color-surface-container-highest: #1e1e22;
+  --color-surface-variant: #18181b;
+  --color-on-surface: #fafafa;
+  --color-on-surface-variant: #a1a1aa;
+  --color-surface-tint: #a78bfa;
+
+  --color-primary: #a78bfa;
+  --color-on-primary: #0a0012;
+  --color-primary-container: #7c3aed;
+  --color-on-primary-container: #ede9fe;
+  --color-primary-fixed: #ede9fe;
+  --color-primary-fixed-dim: #c4b5fd;
+  --color-on-primary-fixed: #2e1065;
+  --color-on-primary-fixed-variant: #5b21b6;
+  --color-inverse-primary: #5b21b6;
+
+  --color-secondary: #71717a;
+  --color-on-secondary: #09090b;
+  --color-secondary-container: #27272a;
+  --color-on-secondary-container: #a1a1aa;
+  --color-secondary-fixed: #a1a1aa;
+  --color-secondary-fixed-dim: #71717a;
+  --color-on-secondary-fixed: #18181b;
+  --color-on-secondary-fixed-variant: #3f3f46;
+
+  --color-tertiary: #34d399;
+  --color-on-tertiary: #001a12;
+  --color-tertiary-container: #065f46;
+  --color-on-tertiary-container: #bbf7d0;
+  --color-tertiary-fixed: #bbf7d0;
+  --color-tertiary-fixed-dim: #6ee7b7;
+  --color-on-tertiary-fixed: #003318;
+  --color-on-tertiary-fixed-variant: #047857;
+
+  --color-error: #ef4444;
+  --color-on-error: #1a0000;
+  --color-error-container: #3b1111;
+  --color-on-error-container: #fca5a5;
+
+  --color-outline: #52525b;
+  --color-outline-variant: #27272a;
+  --color-inverse-surface: #fafafa;
+  --color-inverse-on-surface: #09090b;
+
+  --font-display: var(--font-geist);
+  --font-headline: var(--font-geist);
+  --font-body: var(--font-geist);
+  --font-label: var(--font-geist);
+
+  --font-overlay: var(--font-montserrat);
+}
+
+/*
+ * No global body background on purpose: /overlay must stay truly
+ * transparent for OBS. Admin/control/login screens apply
+ * `bg-background text-on-background` on their own root container instead.
+ */
+
+/* Admin UI icon font + Obsidian card/glow primitives, from Stitch */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.obsidian-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-outline-variant);
+}
+
+.glow-effect {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass-panel {
+  background: rgba(18, 18, 21, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-outline-variant);
+}
+
+.digital-font {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
+}
+
+.active-glow-tertiary {
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 10px;
+}

@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: matchpulse-live:dev
+    volumes:
+      - .:/app
+      # Volúmenes anónimos para que node_modules y .next no sean sobreescritos
+      # por el bind mount del host (evita conflictos entre binarios macOS/Linux).
+      - /app/node_modules
+      - /app/.next
+    environment:
+      # En dev, next dev lee NEXT_PUBLIC_* del entorno en tiempo de ejecución.
+      NEXT_PUBLIC_PUSHER_KEY: ${PUSHER_KEY}
+      NEXT_PUBLIC_PUSHER_CLUSTER: ${PUSHER_CLUSTER}
+      # Polling necesario para que los file-watchers funcionen sobre bind mounts
+      # en Docker Desktop / macOS (inotify no propaga correctamente).
+      WATCHPACK_POLLING: "true"
