@@ -122,7 +122,17 @@ function OBSModal({ matchId, onClose }: { matchId: string; onClose: () => void }
   );
 }
 
-function MatchCard({ entry, onOBS }: { entry: MatchEntry; onOBS: (id: string) => void }) {
+function MatchCard({
+  entry,
+  onOBS,
+  onDelete,
+}: {
+  entry: MatchEntry;
+  onOBS: (id: string) => void;
+  onDelete: (id: string) => Promise<void>;
+}) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const status = matchBroadcastStatus(entry);
   const dateLabel = (() => {
     if (!entry.date) return "";
@@ -211,6 +221,30 @@ function MatchCard({ entry, onOBS }: { entry: MatchEntry; onOBS: (id: string) =>
           <span className="material-symbols-outlined text-sm">monitor</span>
           <span className="hidden sm:inline">OBS</span>
         </button>
+        <button
+          onClick={async (e) => {
+            e.preventDefault();
+            if (!confirmDelete) {
+              setConfirmDelete(true);
+              setTimeout(() => setConfirmDelete(false), 3000);
+              return;
+            }
+            setDeleting(true);
+            await onDelete(entry._id);
+          }}
+          disabled={deleting}
+          title="Eliminar partido"
+          className={`flex items-center justify-center gap-1 border px-3 py-2 rounded-lg text-xs transition-colors ${
+            confirmDelete
+              ? "border-error bg-error/10 text-error"
+              : "border-outline-variant text-on-surface-variant hover:text-error hover:border-error"
+          } disabled:opacity-40`}
+        >
+          <span className="material-symbols-outlined text-sm">
+            {deleting ? "progress_activity" : confirmDelete ? "warning" : "delete"}
+          </span>
+          {confirmDelete && <span>¿Eliminar?</span>}
+        </button>
       </div>
     </div>
   );
@@ -271,6 +305,11 @@ export function DashboardClient() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function handleDeleteMatch(id: string) {
+    await fetch(`/api/matches/${id}`, { method: "DELETE" });
+    setMatches((prev) => prev.filter((m) => m._id !== id));
+  }
 
   function handleNavAction(key: string) {
     setMobileNavOpen(false);
@@ -457,7 +496,7 @@ export function DashboardClient() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {matches.map((entry) => (
-                <MatchCard key={entry._id} entry={entry} onOBS={setObsMatchId} />
+                <MatchCard key={entry._id} entry={entry} onOBS={setObsMatchId} onDelete={handleDeleteMatch} />
               ))}
             </div>
           )}

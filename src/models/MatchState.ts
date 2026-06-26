@@ -101,8 +101,15 @@ export const MatchStateSchema = z.object({
   matchId: z.string(),
   homeScore: z.number().int().min(0).default(0),
   awayScore: z.number().int().min(0).default(0),
-  homeFouls: z.number().int().min(0).max(5).default(0),
-  awayFouls: z.number().int().min(0).max(5).default(0),
+  // Period fouls — reset at half time when foulTracking is on. No max cap:
+  // counting continues past 5 (the 5-dot indicator is display-only).
+  homeFouls: z.number().int().min(0).default(0),
+  awayFouls: z.number().int().min(0).default(0),
+  // Accumulated fouls from previous periods (never resets during match).
+  // Total fouls = homeTotalFouls + homeFouls.
+  homeTotalFouls: z.number().int().min(0).default(0),
+  awayTotalFouls: z.number().int().min(0).default(0),
+  foulTracking: z.boolean().default(false),
   // min(5), not a fixed length — sudden death keeps appending rounds past
   // the initial 5 when tied. The overlay/control UI always show only the
   // last 5 (see lib/format.ts's visiblePenaltyWindow), but the full history
@@ -190,8 +197,11 @@ export const MatchStatePatchSchema = z
   .object({
     homeScore: z.number().int().min(0),
     awayScore: z.number().int().min(0),
-    homeFouls: z.number().int().min(0).max(5),
-    awayFouls: z.number().int().min(0).max(5),
+    homeFouls: z.number().int().min(0),
+    awayFouls: z.number().int().min(0),
+    homeTotalFouls: z.number().int().min(0),
+    awayTotalFouls: z.number().int().min(0),
+    foulTracking: z.boolean(),
     homePenalties: z.array(PenaltyResultSchema).min(5),
     awayPenalties: z.array(PenaltyResultSchema).min(5),
     homeRedCards: z.number().int().min(0),

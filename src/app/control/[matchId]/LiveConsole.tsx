@@ -249,6 +249,8 @@ export function LiveConsole({ matchId }: { matchId: string }) {
       awayScore: 0,
       homeFouls: 0,
       awayFouls: 0,
+      homeTotalFouls: 0,
+      awayTotalFouls: 0,
       homePenalties: [0, 0, 0, 0, 0],
       awayPenalties: [0, 0, 0, 0, 0],
       homeRedCards: 0,
@@ -420,10 +422,12 @@ export function LiveConsole({ matchId }: { matchId: string }) {
             side="home"
             score={state.homeScore}
             fouls={state.homeFouls}
+            totalFouls={state.homeTotalFouls + state.homeFouls}
+            foulTracking={state.foulTracking}
             redCards={state.homeRedCards}
             yellowCards={state.homeYellowCards}
             onScoreChange={(delta) => patch({ homeScore: Math.max(0, state.homeScore + delta) })}
-            onFoulsChange={(delta) => patch({ homeFouls: Math.min(5, Math.max(0, state.homeFouls + delta)) })}
+            onFoulsChange={(delta) => patch({ homeFouls: Math.max(0, state.homeFouls + delta) })}
             onRedCardAdd={(player) =>
               patch({
                 homeRedCards: state.homeRedCards + 1,
@@ -500,10 +504,12 @@ export function LiveConsole({ matchId }: { matchId: string }) {
             side="away"
             score={state.awayScore}
             fouls={state.awayFouls}
+            totalFouls={state.awayTotalFouls + state.awayFouls}
+            foulTracking={state.foulTracking}
             redCards={state.awayRedCards}
             yellowCards={state.awayYellowCards}
             onScoreChange={(delta) => patch({ awayScore: Math.max(0, state.awayScore + delta) })}
-            onFoulsChange={(delta) => patch({ awayFouls: Math.min(5, Math.max(0, state.awayFouls + delta)) })}
+            onFoulsChange={(delta) => patch({ awayFouls: Math.max(0, state.awayFouls + delta) })}
             onRedCardAdd={(player) =>
               patch({
                 awayRedCards: state.awayRedCards + 1,
@@ -581,6 +587,8 @@ export function LiveConsole({ matchId }: { matchId: string }) {
         }
         clock={state.clock}
         onClockConfigChange={(config) => patch({ clockConfig: config })}
+        foulTracking={state.foulTracking}
+        onFoulTrackingToggle={() => patch({ foulTracking: !state.foulTracking })}
         locked={state.locked}
         onUnlock={() => patch({ locked: false })}
       />

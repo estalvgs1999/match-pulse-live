@@ -30,6 +30,8 @@ export interface MatchSettingsModalProps {
   // match" instead of two (gear icon here, tune icon there).
   clock: Clock;
   onClockConfigChange: (config: ClockConfigUpdate) => void;
+  foulTracking: boolean;
+  onFoulTrackingToggle: () => void;
   // "End Match" locks the document (see route.ts) — this is the deliberate
   // escape hatch for operator error, separate from the regular patch flow
   // so it can't happen by accident.
@@ -71,6 +73,8 @@ export function MatchSettingsModal({
   onAggregateScoreChange,
   clock,
   onClockConfigChange,
+  foulTracking,
+  onFoulTrackingToggle,
   locked,
   onUnlock,
 }: MatchSettingsModalProps) {
@@ -255,6 +259,31 @@ export function MatchSettingsModal({
               />
             </div>
           )}
+        </div>
+
+        <div className="mt-7 pt-5 border-t border-outline-variant">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant block">
+                Faltas por Tiempo
+              </span>
+              <span className="text-[10px] text-on-surface-variant mt-0.5 block">
+                Cuenta faltas por período · reinicia al medio tiempo
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onFoulTrackingToggle}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase transition-all ${
+                foulTracking
+                  ? "border-tertiary bg-tertiary-container text-tertiary-fixed-dim active-glow-tertiary"
+                  : "border-outline-variant bg-surface-container-high hover:border-primary"
+              }`}
+            >
+              <span className="material-symbols-outlined text-sm">sports</span>
+              {foulTracking ? "Activo" : "Off"}
+            </button>
+          </div>
         </div>
 
         <div className="mt-7 pt-5 border-t border-outline-variant">

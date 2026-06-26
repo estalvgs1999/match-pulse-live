@@ -129,9 +129,24 @@ export async function PATCH(
     nextClock = applyClockAction(nextClock, clockAction, syncSeconds);
   }
 
+  // When foul tracking is on and the period transitions to half_time, accumulate
+  // period fouls into the totals and reset the period counter. This is the only
+  // boundary where period fouls reset — extra time resets are triggered manually.
+  const foulReset: Partial<MatchState> = {};
+  if (
+    rest.matchStatus === "half_time" &&
+    (rest.foulTracking ?? current.foulTracking)
+  ) {
+    foulReset.homeTotalFouls = (current.homeTotalFouls ?? 0) + current.homeFouls;
+    foulReset.awayTotalFouls = (current.awayTotalFouls ?? 0) + current.awayFouls;
+    foulReset.homeFouls = 0;
+    foulReset.awayFouls = 0;
+  }
+
   const next: MatchState = {
     ...current,
     ...rest,
+    ...foulReset,
     scorers: { ...current.scorers, ...scorers },
     clock: nextClock,
     updatedAt: Date.now(),

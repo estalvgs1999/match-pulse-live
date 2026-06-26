@@ -79,20 +79,33 @@ export async function DELETE(
   if (!oid) return Response.json({ error: "Not found" }, { status: 404 });
 
   const db = await getDb();
-  // Prevent deletion if team is assigned to any match
-  const matchCount = await db.collection("matches").countDocuments({
-    $or: [{ homeTeamId: id }, { awayTeamId: id }],
-  });
+  const team = await db.collection("teams").findOne({ _id: oid });
+  if (!team) return Response.json({ error: "Not found" }, { status: 404 });
 
-  if (matchCount > 0) {
-    return Response.json(
-      {
-        error:
-          "No se puede eliminar: el equipo está asignado a uno o más partidos.",
-      },
-      { status: 409 }
-    );
-  }
+  // Build a snapshot of the team so match history is preserved after deletion.
+  const snapshot = {
+    name: team.name,
+    shortName: team.shortName,
+    logoUrl: team.logoUrl ?? "",
+    colors: team.colors,
+    roster: (team.roster ?? []).map((p: { number: number; name: string; position?: string; portraitUrl?: string }) => ({
+      number: p.number,
+      name: p.name,
+      position: p.position ?? "",
+      portraitUrl: p.portraitUrl,
+    })),
+    coach: team.coach ?? "",
+  };
+
+  // Embed snapshot into every match that references this team before deleting.
+  await db.collection("matches").updateMany(
+    { homeTeamId: id },
+    { $set: { homeTeamSnapshot: snapshot } }
+  );
+  await db.collection("matches").updateMany(
+    { awayTeamId: id },
+    { $set: { awayTeamSnapshot: snapshot } }
+  );
 
   await db.collection("teams").deleteOne({ _id: oid });
   return Response.json({ ok: true });

@@ -11,6 +11,8 @@ export interface TeamPanelProps {
   side: "home" | "away";
   score: number;
   fouls: number;
+  totalFouls: number;
+  foulTracking: boolean;
   redCards: number;
   yellowCards: number;
   onScoreChange: (delta: number) => void;
@@ -39,6 +41,8 @@ export function TeamPanel({
   side,
   score,
   fouls,
+  totalFouls,
+  foulTracking,
   redCards,
   yellowCards,
   onScoreChange,
@@ -127,14 +131,24 @@ export function TeamPanel({
         <div className="w-full pt-5 border-t border-outline-variant grid grid-cols-3 gap-3">
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-[10px] text-on-surface-variant uppercase">Fouls</span>
-              <span className="text-base font-bold text-tertiary">{fouls}</span>
+              <span className="text-[10px] text-on-surface-variant uppercase">
+                {foulTracking ? "Faltas P." : "Fouls"}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-base font-bold ${fouls >= 5 ? "text-error" : "text-tertiary"}`}>
+                  {fouls}
+                </span>
+                {foulTracking && (
+                  <span className="text-[9px] text-on-surface-variant">/{totalFouls} tot</span>
+                )}
+              </div>
             </div>
             <div className="flex gap-1.5">
               <button
                 type="button"
-                className="flex-1 material-symbols-outlined text-on-surface-variant hover:text-error bg-surface-container-highest rounded-lg py-2.5"
+                className="flex-1 material-symbols-outlined text-on-surface-variant hover:text-error disabled:opacity-30 disabled:hover:text-on-surface-variant bg-surface-container-highest rounded-lg py-2.5"
                 onClick={() => onFoulsChange(-1)}
+                disabled={fouls === 0}
                 aria-label="Decrease fouls"
               >
                 remove
