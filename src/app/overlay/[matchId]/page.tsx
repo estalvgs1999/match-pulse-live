@@ -6,6 +6,7 @@ import { useMatchState } from "@/hooks/useMatchState";
 import { useServerOffset } from "@/hooks/useServerOffset";
 import { useMatchClock } from "@/hooks/useMatchClock";
 import { usePlayerEventChip } from "@/hooks/usePlayerEventChip";
+import { useObsHeartbeat } from "@/hooks/useObsHeartbeat";
 import { DEFAULT_CLOCK } from "@/models/MatchState";
 
 // Redesigned template
@@ -76,6 +77,7 @@ export default function OverlayPage({
   const { offsetMs } = useServerOffset();
   const elapsedSeconds = useMatchClock(state?.clock ?? DEFAULT_CLOCK, offsetMs);
   const playerEvent = usePlayerEventChip(matchId);
+  useObsHeartbeat(matchId);
 
   // Stay blank (transparent) until both hydrate — avoids flashing default
   // values over the broadcast feed. Same path runs on a fresh OBS source

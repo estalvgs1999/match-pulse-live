@@ -16,6 +16,46 @@ import type { RosterPlayer } from "@/models/Team";
 import { DEFAULT_CLOCK, type MatchStatus, type PenaltyResult } from "@/models/MatchState";
 import { countMade } from "@/lib/format";
 
+function useObsStatus(matchId: string) {
+  const [connected, setConnected] = useState<boolean | null>(null);
+  useEffect(() => {
+    let active = true;
+    async function check() {
+      try {
+        const res = await fetch(`/api/matches/${matchId}/obs-status`);
+        if (res.ok) {
+          const data = await res.json();
+          if (active) setConnected(data.connected);
+        }
+      } catch { /* ignore */ }
+    }
+    check();
+    const id = setInterval(check, 5_000);
+    return () => { active = false; clearInterval(id); };
+  }, [matchId]);
+  return connected;
+}
+
+function OBSHeaderButton({ matchId, onClick }: { matchId: string; onClick: () => void }) {
+  const obsConnected = useObsStatus(matchId);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Conexión OBS"
+      className="relative flex items-center gap-1.5 px-3 h-9 rounded-full bg-surface-container-highest border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary transition-colors text-xs font-bold"
+    >
+      <span className="material-symbols-outlined text-base">monitor</span>
+      <span className="hidden sm:inline">OBS</span>
+      {obsConnected !== null && (
+        <span className={`absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full border border-background ${
+          obsConnected ? "bg-tertiary" : "bg-error"
+        }`} />
+      )}
+    </button>
+  );
+}
+
 const NAV_ITEMS = [
   { icon: "dashboard", label: "Dashboard", active: false, href: "/dashboard" },
   { icon: "groups", label: "Teams", active: false, href: "/dashboard/teams" },
@@ -395,15 +435,7 @@ export function LiveConsole({ matchId }: { matchId: string }) {
             </nav>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setObsOpen(true)}
-              aria-label="Conexión OBS"
-              className="flex items-center gap-1.5 px-3 h-9 rounded-full bg-surface-container-highest border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary transition-colors text-xs font-bold"
-            >
-              <span className="material-symbols-outlined text-base">monitor</span>
-              <span className="hidden sm:inline">OBS</span>
-            </button>
+            <OBSHeaderButton matchId={matchId} onClick={() => setObsOpen(true)} />
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
@@ -629,6 +661,7 @@ export function LiveConsole({ matchId }: { matchId: string }) {
 
 function OBSModal({ matchId, onClose }: { matchId: string; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
+  const obsConnected = useObsStatus(matchId);
   const url =
     typeof window !== "undefined"
       ? `${window.location.origin}/overlay/${matchId}`
@@ -655,6 +688,41 @@ function OBSModal({ matchId, onClose }: { matchId: string; onClose: () => void }
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
         </div>
+
+        {/* Connection status */}
+        <div className={`flex items-center gap-3 rounded-lg px-4 py-3 border ${
+          obsConnected === null
+            ? "border-outline-variant bg-surface-container"
+            : obsConnected
+              ? "border-tertiary/40 bg-tertiary/5"
+              : "border-error/40 bg-error/5"
+        }`}>
+          {obsConnected === null ? (
+            <span className="h-2.5 w-2.5 rounded-full bg-outline animate-pulse flex-shrink-0" />
+          ) : obsConnected ? (
+            <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary" />
+            </span>
+          ) : (
+            <span className="h-2.5 w-2.5 rounded-full bg-error flex-shrink-0" />
+          )}
+          <div>
+            <p className={`text-xs font-bold uppercase tracking-wider ${
+              obsConnected === null ? "text-on-surface-variant" : obsConnected ? "text-tertiary" : "text-error"
+            }`}>
+              {obsConnected === null ? "Verificando..." : obsConnected ? "OBS Conectado" : "OBS Desconectado"}
+            </p>
+            <p className="text-[10px] text-on-surface-variant mt-0.5">
+              {obsConnected === null
+                ? "Comprobando estado del overlay"
+                : obsConnected
+                  ? "El overlay está activo y recibiendo datos"
+                  : "El overlay no está abierto en OBS"}
+            </p>
+          </div>
+        </div>
+
         <div className="bg-surface-container-highest rounded-lg p-3 font-mono text-xs text-on-surface break-all">
           {url}
         </div>
