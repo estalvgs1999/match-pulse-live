@@ -1,20 +1,23 @@
-/* Player event chip — appears just below the scorebug for goals and cards.
-   Badge color + outer glow derive from the event type (goal → team color,
-   red/yellow card → their literal card color), applied via inline style. */
+/* Lower-third chip below the scorebug — same green/black/white family,
+   not a one-off design. Goal: colored team-accent edge + "GOAL" tag.
+   Red card: a small card-shaped icon that flips in on its own axis. */
 
 .wrapper {
   position: absolute;
+  /* A clearly visible gap below the green bar (mainBar is 66px tall) —
+     78px (12px gap) still read as glued-on; 90px (24px gap) gives real
+     breathing room without floating away from the scoreboard. */
   top: 90px;
   left: 0;
-  width: 420px;
-  height: 64px;
-  background-color: #0c120e;
-  border-radius: 12px;
+  width: 380px;
+  height: 54px;
+  background-color: #18181a;
+  border-radius: 10px;
   z-index: 6;
   display: flex;
   align-items: stretch;
   box-sizing: border-box;
-  /* box-shadow set via inline style when visible (includes event-color glow) */
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
   opacity: 0;
   transform: translate(-24px, 0);
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
@@ -26,11 +29,8 @@
   transform: translate(0, 0);
 }
 
-/* Left badge — backgroundColor set via inline style (event accent color).
-   Wider than before so the "GOAL" text and card icons have real breathing
-   room instead of being cramped in a narrow column. */
 .badge {
-  width: 72px;
+  width: 64px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -38,18 +38,27 @@
 }
 
 .badgeText {
-  color: rgba(0, 0, 0, 0.75);
+  color: #0a1c11;
   font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 1.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 }
 
+.cardIconWrap {
+  width: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 200px;
+}
+
 .cardIcon {
-  width: 24px;
-  height: 32px;
-  background-color: #ff2222;
+  width: 22px;
+  height: 30px;
+  background-color: #ff0000;
   border-radius: 3px;
   animation: cardFlip 0.5s ease-out;
 }
@@ -78,12 +87,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 18px;
-  gap: 2px;
+  padding: 0 16px;
+  gap: 1px;
 }
 
 .eventLabel {
-  color: rgba(255, 255, 255, 0.5);
+  color: #67f58b;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -97,9 +106,9 @@
   overflow: hidden;
 }
 
-/* color set via inline style (event accent color) */
 .number {
-  font-size: 19px;
+  color: #67f58b;
+  font-size: 18px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
@@ -107,7 +116,7 @@
 
 .name {
   color: #ffffff;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;

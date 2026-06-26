@@ -1,6 +1,9 @@
-/* Bottom-left chips — timeout banner and replay pill. Colors unified with
-   the new overlay design language: near-black card (#0c120e), border, green
-   accent. Layout/positioning/animation unchanged. */
+/* Bottom-left corner — opposite the scorebug, same 32px margin so the two
+   anchor points feel symmetric. Sized to match the scorebug's visual
+   weight (roughly its own 500x66 footprint), not a small aside — these
+   are full standalone announcements when they appear. Timeout banner and
+   replay pill can both be visible at once (stacked), since a replay can
+   happen during a timeout. */
 
 .container {
   position: absolute;
@@ -19,11 +22,10 @@
   align-items: stretch;
   width: 540px;
   height: 92px;
-  background-color: #0c120e;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background-color: #18181a;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
   opacity: 0;
   transform: translate(0, 20px);
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
@@ -34,7 +36,6 @@
   transform: translate(0, 0);
 }
 
-/* Left accent strip — filled with the team's color (via inline style) */
 .timeoutAccent {
   width: 17px;
   flex-shrink: 0;
@@ -72,11 +73,11 @@
   align-items: center;
   gap: 14px;
   padding: 16px 30px;
-  background-color: #0c120e;
-  border: 1px solid rgba(103, 245, 139, 0.18);
+  background-color: rgba(24, 24, 26, 0.75);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 32px;
   width: fit-content;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
   opacity: 0;
   transform: translate(0, 20px);
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
@@ -91,7 +92,7 @@
   width: 15px;
   height: 15px;
   border-radius: 50%;
-  background-color: #ff3b3b;
+  background-color: #ff0000;
   animation: replayPulse 1.4s ease-in-out infinite;
 }
 
@@ -99,11 +100,11 @@
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgba(255, 59, 59, 0.5);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.5);
   }
   50% {
-    opacity: 0.65;
-    box-shadow: 0 0 0 9px rgba(255, 59, 59, 0);
+    opacity: 0.6;
+    box-shadow: 0 0 0 9px rgba(255, 0, 0, 0);
   }
 }
 

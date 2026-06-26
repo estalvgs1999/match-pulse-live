@@ -27,6 +27,8 @@ interface TeamSlotExisting {
 
 type TeamSlot = TeamSlotNew | TeamSlotExisting;
 
+type OverlayTemplate = "classic" | "redesigned";
+
 interface MatchForm {
   tournament: string;
   matchday: string;
@@ -321,6 +323,7 @@ export function NewProjectClient() {
   const [awaySlot, setAwaySlot] = useState<TeamSlot>({ mode: "new", name: "", shortName: "", primaryColor: "#34d399" });
   const [teams, setTeams] = useState<TeamListItem[]>([]);
   const [loadingTeams, setLoadingTeams] = useState(true);
+  const [overlayTemplate, setOverlayTemplate] = useState<OverlayTemplate>("redesigned");
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -398,6 +401,7 @@ export function NewProjectClient() {
       matchday: form.matchday,
       stadium: form.stadium,
       date: dateStr,
+      overlayTemplate,
     };
 
     if (homeSlot.mode === "existing") {
@@ -563,6 +567,98 @@ export function NewProjectClient() {
                 loadingTeams={loadingTeams}
               />
             </div>
+
+            {/* Overlay template */}
+            <section className="glass-panel rounded-xl p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-lg">palette</span>
+                <h2 className="font-bold text-on-surface text-sm uppercase tracking-wider">Plantilla de Overlay</h2>
+              </div>
+              <p className="text-xs text-on-surface-variant">
+                Diseño visual que se usará en el overlay de transmisión para este partido.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(["redesigned", "classic"] as const).map((t) => {
+                  const isSelected = overlayTemplate === t;
+                  const meta = t === "redesigned"
+                    ? {
+                        label: "Rediseñado",
+                        desc: "Paleta oscura unificada, anillos de color por equipo, tints adaptativos.",
+                        icon: "auto_awesome",
+                        preview: (
+                          <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#0c120e] border border-white/10">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: home.color }} />
+                              <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
+                            </div>
+                            <div className="flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded text-[11px] font-black text-white digital-font">
+                              <span>0</span>
+                              <span className="text-white/40 mx-0.5">–</span>
+                              <span>0</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
+                              <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: away.color }} />
+                            </div>
+                          </div>
+                        ),
+                      }
+                    : {
+                        label: "Clásico",
+                        desc: "Diseño original tipo broadcast, fondo verde oscuro, sin tints de color.",
+                        icon: "tv",
+                        preview: (
+                          <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#1a2e1a] border border-white/10">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-5 h-5 rounded-full bg-white/20" />
+                              <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
+                            </div>
+                            <div className="flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded text-[11px] font-black text-white digital-font">
+                              <span>0</span>
+                              <span className="text-white/40 mx-0.5">–</span>
+                              <span>0</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
+                              <div className="w-5 h-5 rounded-full bg-white/20" />
+                            </div>
+                          </div>
+                        ),
+                      };
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setOverlayTemplate(t)}
+                      className={`text-left rounded-xl p-4 border-2 transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/10"
+                          : "border-outline-variant hover:border-outline bg-surface-container"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className="material-symbols-outlined text-base"
+                          style={{ color: isSelected ? "var(--color-primary)" : "var(--color-on-surface-variant)" }}
+                        >
+                          {meta.icon}
+                        </span>
+                        <span className={`text-sm font-bold ${isSelected ? "text-primary" : "text-on-surface"}`}>
+                          {meta.label}
+                        </span>
+                        {isSelected && (
+                          <span className="ml-auto material-symbols-outlined text-primary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            check_circle
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-on-surface-variant leading-relaxed">{meta.desc}</p>
+                      {meta.preview}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
             {/* Preview */}
             <section className="glass-panel rounded-xl p-5">

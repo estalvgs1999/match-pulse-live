@@ -46,19 +46,18 @@
 }
 
 .logoWrapper {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  border: 3px solid;
-  background: rgba(0, 0, 0, 0.3);
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  background-color: #ffffff;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 6px;
   box-sizing: border-box;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   flex-shrink: 0;
-  /* border-color and box-shadow set via inline style (team accent color) */
 }
 
 .logoWrapper img {
@@ -68,7 +67,7 @@
 }
 
 .teamName {
-  color: var(--lineup-header-text);
+  color: #ffffff;
   font-size: 36px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -202,7 +201,7 @@
 }
 
 .sectionLabel {
-  color: var(--lineup-body-text-dim);
+  color: #ffffff;
   font-size: 16px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -303,13 +302,13 @@
 .gloveIcon {
   width: 18px;
   height: 18px;
-  color: var(--lineup-body-text);
+  color: #ffffff;
 }
 
 .rowNumber {
   width: 24px;
   flex-shrink: 0;
-  color: var(--lineup-body-text);
+  color: #ffffff;
   font-size: 17px;
   font-weight: 800;
   text-align: right;
@@ -324,12 +323,12 @@
 }
 
 .rowFirstName {
-  color: var(--lineup-body-text-dim);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
 .rowSurname {
-  color: var(--lineup-body-text);
+  color: #ffffff;
   font-weight: 800;
 }
 
@@ -338,8 +337,8 @@
   height: 20px;
   flex-shrink: 0;
   border-radius: 50%;
-  border: 1.5px solid var(--lineup-body-text);
-  color: var(--lineup-body-text);
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
   font-size: 10px;
   font-weight: 800;
   display: flex;
@@ -359,7 +358,7 @@
 }
 
 .coachLabel {
-  color: var(--lineup-body-text-dim);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -367,7 +366,7 @@
 }
 
 .coachValue {
-  color: var(--lineup-body-text);
+  color: #ffffff;
   font-size: 18px;
   font-weight: 800;
 }

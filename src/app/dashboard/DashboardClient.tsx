@@ -244,10 +244,7 @@ function SkeletonCard() {
 
 const NAV_ITEMS = [
   { icon: "dashboard", label: "Dashboard", key: "dashboard" },
-  { icon: "sports_score", label: "Match Control", key: "control" },
-  { icon: "layers", label: "Overlay Manager", key: "overlay" },
-  { icon: "rss_feed", label: "Data Streams", key: "streams" },
-  { icon: "groups", label: "Team Database", key: "teams" },
+  { icon: "groups", label: "Teams", key: "teams" },
 ];
 
 export function DashboardClient() {
@@ -256,7 +253,6 @@ export function DashboardClient() {
   const [loading, setLoading] = useState(true);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [obsMatchId, setObsMatchId] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -276,35 +272,15 @@ export function DashboardClient() {
     load();
   }, [load]);
 
-  function showToast(msg: string) {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2500);
-  }
-
   function handleNavAction(key: string) {
     setMobileNavOpen(false);
     if (key === "dashboard") {
       router.push("/dashboard");
       return;
     }
-    if (key === "control") {
-      const live = matches.find((m) => matchBroadcastStatus(m) === "live");
-      const target = live ?? matches[0];
-      router.push(target ? `/control/${target._id}` : "/dashboard/new");
-      return;
-    }
-    if (key === "overlay") {
-      const live = matches.find((m) => matchBroadcastStatus(m) === "live");
-      const target = live ?? matches[0];
-      if (target) setObsMatchId(target._id);
-      else showToast("Crea un partido primero para obtener el link de overlay.");
-      return;
-    }
     if (key === "teams") {
       router.push("/dashboard/teams");
-      return;
     }
-    showToast("Próximamente — esta sección está en desarrollo.");
   }
 
   async function handleLogout() {
@@ -336,14 +312,6 @@ export function DashboardClient() {
 
   const sidebarFooter = (
     <div className="mt-auto pt-4 space-y-1 border-t border-outline-variant">
-      <button
-        type="button"
-        onClick={() => showToast("System Health — próximamente.")}
-        className="w-full flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg group text-left"
-      >
-        <span className="material-symbols-outlined text-xl">memory</span>
-        <span className="font-body text-sm">System Health</span>
-      </button>
       <button
         type="button"
         onClick={handleLogout}
@@ -526,13 +494,6 @@ export function DashboardClient() {
       {/* OBS Modal */}
       {obsMatchId && <OBSModal matchId={obsMatchId} onClose={() => setObsMatchId(null)} />}
 
-      {/* Toast */}
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-surface-container-highest border border-outline-variant text-on-surface text-sm font-medium px-4 py-3 rounded-xl shadow-xl pointer-events-none">
-          <span className="material-symbols-outlined text-base text-primary">info</span>
-          {toast}
-        </div>
-      )}
     </div>
   );
 }

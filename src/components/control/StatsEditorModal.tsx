@@ -11,6 +11,8 @@ export interface StatsEditorModalProps {
   homeStats: TeamStats;
   awayStats: TeamStats;
   onChange: (side: "home" | "away", patch: Partial<TeamStats>) => void;
+  onGoLive?: () => void;
+  isLive?: boolean;
 }
 
 function Stepper({
@@ -62,6 +64,8 @@ export function StatsEditorModal({
   homeStats,
   awayStats,
   onChange,
+  onGoLive,
+  isLive = false,
 }: StatsEditorModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -94,6 +98,28 @@ export function StatsEditorModal({
             close
           </button>
         </div>
+
+        {onGoLive && (
+          <div className="flex items-center justify-between mb-6 pb-6 border-b border-outline-variant">
+            <span className="text-xs text-on-surface-variant">
+              {isLive ? "Graphic is on air" : "Configure data, then send to overlay"}
+            </span>
+            <button
+              type="button"
+              onClick={() => { onGoLive(); onClose(); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
+                isLive
+                  ? "border border-tertiary bg-tertiary-container text-tertiary-fixed-dim active-glow-tertiary"
+                  : "bg-tertiary text-on-tertiary hover:opacity-90"
+              }`}
+            >
+              <span className="material-symbols-outlined text-sm">
+                {isLive ? "sensors" : "play_circle"}
+              </span>
+              {isLive ? "En Aire" : "Mostrar en pantalla"}
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-8">
           <div className="space-y-4">
