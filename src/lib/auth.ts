@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 const COOKIE_NAME = "mpl_session";
+const SESSION_TOKEN = "authenticated";
 const MAX_AGE_SECONDS = 60 * 60 * 12; // 12h, a typical broadcast shift
 
 export function verifyPassword(input: string): boolean {
@@ -9,10 +10,8 @@ export function verifyPassword(input: string): boolean {
 }
 
 export async function setSessionCookie(): Promise<void> {
-  const password = process.env.CONTROL_PASSWORD;
-  if (!password) throw new Error("Missing CONTROL_PASSWORD environment variable");
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, password, {
+  cookieStore.set(COOKIE_NAME, SESSION_TOKEN, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -27,8 +26,6 @@ export async function clearSessionCookie(): Promise<void> {
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const password = process.env.CONTROL_PASSWORD;
-  if (!password) return false;
   const cookieStore = await cookies();
-  return cookieStore.get(COOKIE_NAME)?.value === password;
+  return cookieStore.get(COOKIE_NAME)?.value === SESSION_TOKEN;
 }
