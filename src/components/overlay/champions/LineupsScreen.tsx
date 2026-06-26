@@ -19,70 +19,7 @@ function cx(...classes: Array<string | false | undefined>): string {
 }
 
 const GOALKEEPER_PATTERN = /portero|portera|goalkeeper|^gk$|arquero/i;
-const SCAN_STEP_MS = 1100;
-const ROW_STAGGER_S = 0.045;
 
-function isGoalkeeper(position: string): boolean {
-  return GOALKEEPER_PATTERN.test(position.trim());
-}
-
-function NameLabel({ name }: { name: string }) {
-  const lastSpace = name.trim().lastIndexOf(" ");
-  if (lastSpace === -1) {
-    return <span className={styles.rowSurname}>{name}</span>;
-  }
-  return (
-    <>
-      <span className={styles.rowFirstName}>{name.slice(0, lastSpace)} </span>
-      <span className={styles.rowSurname}>{name.slice(lastSpace + 1)}</span>
-    </>
-  );
-}
-
-function GloveIcon() {
-  return (
-    <svg className={styles.gloveIcon} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M7 11V5.5a1.5 1.5 0 0 1 3 0V10M10 10V4a1.5 1.5 0 0 1 3 0v6M13 10V5a1.5 1.5 0 0 1 3 0v6M16 11V7a1.5 1.5 0 0 1 3 0v6.5c0 3.6-2.7 6.5-6 6.5h-1c-3 0-5.5-2-6.5-4.7L4 10.8c-.4-.9 0-2 .9-2.4.8-.4 1.8 0 2.2.8L8 11"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function PlayerRow({
-  player,
-  isCaptain,
-  isCurrent,
-  visible,
-  delay,
-}: {
-  player: RosterPlayer;
-  isCaptain: boolean;
-  isCurrent: boolean;
-  visible: boolean;
-  delay: number;
-}) {
-  return (
-    <div
-      className={cx(styles.row, isCurrent && styles.rowCurrent, visible && styles.rowVisible)}
-      style={{ "--stagger-delay": visible ? `${delay}s` : "0s" } as CSSProperties}
-    >
-      <span className={styles.gkSlot}>{isGoalkeeper(player.position) && <GloveIcon />}</span>
-      <span className={styles.rowNumber}>{player.number}</span>
-      <span className={styles.rowName}>
-        <NameLabel name={player.name} />
-      </span>
-      {isCaptain && <span className={styles.captainBadge}>C</span>}
-    </div>
-  );
-}
-
-// Briefly forces effectiveVisible=false when the team changes while the screen
-// is on, so the exit and re-entry animations replay for the new team.
 function useTeamCycle(visible: boolean, teamId: string): boolean {
   const [cycling, setCycling] = useState(false);
   const prevId = useRef(teamId);
@@ -96,9 +33,52 @@ function useTeamCycle(visible: boolean, teamId: string): boolean {
   }, [teamId, visible]);
   return cycling;
 }
+const SCAN_STEP_MS = 1100;
+const ROW_STAGGER_S = 0.04;
 
-// Intro scan: walks the current-player highlight through the full roster
-// once on each visible → hidden → visible cycle, then rests on none.
+function isGoalkeeper(position: string): boolean {
+  return GOALKEEPER_PATTERN.test(position.trim());
+}
+
+/* Abbreviate first name to initial: "Juan García" → initial "J.", surname "GARCÍA" */
+function splitName(name: string): { initial: string; surname: string } {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return { initial: "", surname: parts[0].toUpperCase() };
+  return {
+    initial: parts[0][0].toUpperCase() + ".",
+    surname: parts.slice(1).join(" ").toUpperCase(),
+  };
+}
+
+function GloveIcon() {
+  return (
+    <svg className={styles.gloveIcon} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M7 11V5.5a1.5 1.5 0 0 1 3 0V10M10 10V4a1.5 1.5 0 0 1 3 0v6M13 10V5a1.5 1.5 0 0 1 3 0v6M16 11V7a1.5 1.5 0 0 1 3 0v6.5c0 3.6-2.7 6.5-6 6.5h-1c-3 0-5.5-2-6.5-4.7L4 10.8c-.4-.9 0-2 .9-2.4.8-.4 1.8 0 2.2.8L8 11"
+        stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function PlayerRow({ player, isCaptain, isCurrent, visible, delay }: {
+  player: RosterPlayer; isCaptain: boolean; isCurrent: boolean; visible: boolean; delay: number;
+}) {
+  const { initial, surname } = splitName(player.name);
+  return (
+    <div
+      className={cx(styles.row, isCurrent && styles.rowCurrent, visible && styles.rowVisible)}
+      style={{ "--stagger-delay": visible ? `${delay}s` : "0s" } as CSSProperties}
+    >
+      <span className={styles.rowNumber}>{player.number}</span>
+      <span className={styles.gkSlot}>{isGoalkeeper(player.position) && <GloveIcon />}</span>
+      {initial && <span className={styles.rowInitial}>{initial}</span>}
+      <span className={styles.rowSurname}>{surname}</span>
+      {isCaptain && <span className={styles.captainBadge}>C</span>}
+    </div>
+  );
+}
+
 function useIntroScan(visible: boolean, rosterOrder: RosterPlayer[]): RosterPlayer | null {
   const [scanIndex, setScanIndex] = useState<number | null>(null);
   const [prevVisible, setPrevVisible] = useState(false);
@@ -106,24 +86,16 @@ function useIntroScan(visible: boolean, rosterOrder: RosterPlayer[]): RosterPlay
     setPrevVisible(visible);
     setScanIndex(visible ? 0 : null);
   }
-
   useEffect(() => {
     if (scanIndex === null || scanIndex >= rosterOrder.length) return;
     const timer = setTimeout(() => setScanIndex((i) => (i === null ? null : i + 1)), SCAN_STEP_MS);
     return () => clearTimeout(timer);
   }, [scanIndex, rosterOrder.length]);
-
   if (scanIndex === null || scanIndex >= rosterOrder.length) return null;
   return rosterOrder[scanIndex];
 }
 
-export function LineupsScreen({
-  visible,
-  team,
-  startingNumbers,
-  captainNumber,
-  currentPlayerNumber,
-}: LineupsScreenProps) {
+export function LineupsScreen({ visible, team, startingNumbers, captainNumber, currentPlayerNumber }: LineupsScreenProps) {
   const teamId = team?._id ?? team?.slug ?? team?.name ?? "";
   const cycling = useTeamCycle(visible, teamId);
   const effectiveVisible = visible && !cycling;
@@ -145,28 +117,19 @@ export function LineupsScreen({
           <img src={team?.logoUrl || DEFAULT_TEAM_LOGO} alt="" />
         </div>
         <span className={styles.teamName}>{team?.name ?? ""}</span>
+        <span className={styles.headerLabel}>Starting Lineup</span>
       </div>
 
       <div className={styles.body}>
-        <div className={cx(styles.spotlightColumn, effectiveVisible && styles.spotlightColumnVisible)}>
-          <img
-            className={styles.portrait}
-            src={currentPlayer?.portraitUrl || DEFAULT_PLAYER_PORTRAIT}
-            alt=""
-          />
-        </div>
-
         <div className={styles.rosterColumn}>
           <h3 className={cx(styles.sectionLabel, effectiveVisible && styles.sectionLabelVisible)}>Starting 5</h3>
           <div className={styles.rowList}>
             {starting.map((player, i) => (
               <PlayerRow
-                key={player.number}
-                player={player}
+                key={player.number} player={player}
                 isCaptain={player.number === captainNumber}
                 isCurrent={player.number === effectiveCurrentNumber}
-                visible={effectiveVisible}
-                delay={0.1 + i * ROW_STAGGER_S}
+                visible={effectiveVisible} delay={0.1 + i * ROW_STAGGER_S}
               />
             ))}
           </div>
@@ -181,16 +144,15 @@ export function LineupsScreen({
               </h3>
               <div className={styles.benchColumns}>
                 {[bench.slice(0, Math.ceil(bench.length / 2)), bench.slice(Math.ceil(bench.length / 2))].map(
-                  (column, colIndex) => (
-                    <div key={colIndex} className={styles.rowList}>
-                      {column.map((player, i) => (
+                  (col, ci) => (
+                    <div key={ci} className={styles.rowList}>
+                      {col.map((player, i) => (
                         <PlayerRow
-                          key={player.number}
-                          player={player}
+                          key={player.number} player={player}
                           isCaptain={player.number === captainNumber}
                           isCurrent={player.number === effectiveCurrentNumber}
                           visible={effectiveVisible}
-                          delay={0.15 + (starting.length + colIndex * column.length + i) * ROW_STAGGER_S}
+                          delay={0.15 + (starting.length + ci * col.length + i) * ROW_STAGGER_S}
                         />
                       ))}
                     </div>
@@ -199,14 +161,22 @@ export function LineupsScreen({
               </div>
             </>
           )}
+
+          {team?.coach && (
+            <div className={styles.coachBlock}>
+              <span className={styles.coachLabel}>Head Coach</span>
+              <span className={styles.coachValue}>{team.coach}</span>
+            </div>
+          )}
         </div>
 
-        {team?.coach && (
-          <div className={styles.coachBlock}>
-            <span className={styles.coachLabel}>Head Coach</span>
-            <span className={styles.coachValue}>{team.coach}</span>
-          </div>
-        )}
+        <div className={cx(styles.spotlightColumn, effectiveVisible && styles.spotlightColumnVisible)}>
+          <img
+            className={styles.portrait}
+            src={currentPlayer?.portraitUrl || DEFAULT_PLAYER_PORTRAIT}
+            alt=""
+          />
+        </div>
       </div>
     </div>
   );

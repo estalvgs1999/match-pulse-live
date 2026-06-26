@@ -27,7 +27,7 @@ interface TeamSlotExisting {
 
 type TeamSlot = TeamSlotNew | TeamSlotExisting;
 
-type OverlayTemplate = "classic" | "redesigned";
+type OverlayTemplate = "classic" | "redesigned" | "champions";
 
 interface MatchForm {
   tournament: string;
@@ -577,59 +577,86 @@ export function NewProjectClient() {
               <p className="text-xs text-on-surface-variant">
                 Diseño visual que se usará en el overlay de transmisión para este partido.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {(["redesigned", "classic"] as const).map((t) => {
-                  const isSelected = overlayTemplate === t;
-                  const meta = t === "redesigned"
-                    ? {
-                        label: "Rediseñado",
-                        desc: "Paleta oscura unificada, anillos de color por equipo, tints adaptativos.",
-                        icon: "auto_awesome",
-                        preview: (
-                          <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#0c120e] border border-white/10">
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: home.color }} />
-                              <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
-                            </div>
-                            <div className="flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded text-[11px] font-black text-white digital-font">
-                              <span>0</span>
-                              <span className="text-white/40 mx-0.5">–</span>
-                              <span>0</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
-                              <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: away.color }} />
-                            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {(
+                  [
+                    {
+                      id: "redesigned" as const,
+                      label: "Rediseñado",
+                      desc: "Paleta oscura unificada, anillos de color por equipo, tints adaptativos.",
+                      icon: "auto_awesome",
+                      preview: (
+                        <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#0c120e] border border-white/10">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: home.color }} />
+                            <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
                           </div>
-                        ),
-                      }
-                    : {
-                        label: "Clásico",
-                        desc: "Diseño original tipo broadcast, fondo verde oscuro, sin tints de color.",
-                        icon: "tv",
-                        preview: (
-                          <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#1a2e1a] border border-white/10">
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-5 h-5 rounded-full bg-white/20" />
-                              <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
-                            </div>
-                            <div className="flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded text-[11px] font-black text-white digital-font">
-                              <span>0</span>
-                              <span className="text-white/40 mx-0.5">–</span>
-                              <span>0</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
-                              <div className="w-5 h-5 rounded-full bg-white/20" />
-                            </div>
+                          <div className="flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded text-[11px] font-black text-white digital-font">
+                            <span>0</span>
+                            <span className="text-white/40 mx-0.5">–</span>
+                            <span>0</span>
                           </div>
-                        ),
-                      };
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
+                            <div className="w-5 h-5 rounded-full border-2" style={{ borderColor: away.color }} />
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: "classic" as const,
+                      label: "Clásico",
+                      desc: "Diseño original tipo broadcast, fondo verde oscuro, sin tints de color.",
+                      icon: "tv",
+                      preview: (
+                        <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#1a2e1a] border border-white/10">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-full bg-white/20" />
+                            <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
+                          </div>
+                          <div className="flex items-center gap-1 px-2 py-0.5 bg-white/10 rounded text-[11px] font-black text-white digital-font">
+                            <span>0</span>
+                            <span className="text-white/40 mx-0.5">–</span>
+                            <span>0</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
+                            <div className="w-5 h-5 rounded-full bg-white/20" />
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: "champions" as const,
+                      label: "Champions",
+                      desc: "Estilo UEFA Champions League, paleta navy oscura, tipografía premium.",
+                      icon: "emoji_events",
+                      preview: (
+                        <div className="flex items-center justify-between mt-3 px-3 py-2 rounded-lg bg-[#001233] border border-[#1A56DB]/30">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-5 h-5 rounded-full border border-white/25 bg-white/10" />
+                            <span className="text-[10px] font-black text-white digital-font">{home.shortName}</span>
+                          </div>
+                          <div className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-black text-white digital-font" style={{ backgroundColor: "#001B4D" }}>
+                            <span>0</span>
+                            <span className="text-white/40 mx-0.5">–</span>
+                            <span>0</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-black text-white digital-font">{away.shortName}</span>
+                            <div className="w-5 h-5 rounded-full border border-white/25 bg-white/10" />
+                          </div>
+                        </div>
+                      ),
+                    },
+                  ] as const
+                ).map((t) => {
+                  const isSelected = overlayTemplate === t.id;
                   return (
                     <button
-                      key={t}
+                      key={t.id}
                       type="button"
-                      onClick={() => setOverlayTemplate(t)}
+                      onClick={() => setOverlayTemplate(t.id)}
                       className={`text-left rounded-xl p-4 border-2 transition-all ${
                         isSelected
                           ? "border-primary bg-primary/10"
@@ -641,19 +668,22 @@ export function NewProjectClient() {
                           className="material-symbols-outlined text-base"
                           style={{ color: isSelected ? "var(--color-primary)" : "var(--color-on-surface-variant)" }}
                         >
-                          {meta.icon}
+                          {t.icon}
                         </span>
                         <span className={`text-sm font-bold ${isSelected ? "text-primary" : "text-on-surface"}`}>
-                          {meta.label}
+                          {t.label}
                         </span>
                         {isSelected && (
-                          <span className="ml-auto material-symbols-outlined text-primary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          <span
+                            className="ml-auto material-symbols-outlined text-primary text-base"
+                            style={{ fontVariationSettings: "'FILL' 1" }}
+                          >
                             check_circle
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-on-surface-variant leading-relaxed">{meta.desc}</p>
-                      {meta.preview}
+                      <p className="text-[11px] text-on-surface-variant leading-relaxed">{t.desc}</p>
+                      {t.preview}
                     </button>
                   );
                 })}

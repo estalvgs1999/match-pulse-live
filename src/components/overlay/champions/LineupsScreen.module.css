@@ -1,0 +1,313 @@
+/* Champions Style — lineups. Centered wide panel.
+   UCL roster list format: ## A. SURNAME, portrait spotlight on right. */
+
+.wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1760px;
+  max-height: 620px;
+  transform: translate(-50%, -50%) scale(0.96);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  pointer-events: none;
+  font-family: var(--font-montserrat), sans-serif;
+  border-radius: 3px;
+  overflow: hidden;
+  filter: drop-shadow(0 20px 44px rgba(0, 0, 0, 0.65));
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+}
+
+.wrapperVisible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.header {
+  background: #002B6E;
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  gap: 18px;
+  box-sizing: border-box;
+}
+
+.logoWrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.logoWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.teamName {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.headerLabel {
+  margin-left: auto;
+  color: #00B4FF;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+
+.body {
+  position: relative;
+  background: #001B4D;
+  height: 548px;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Portrait spotlight (right side) ────────────────────────────── */
+
+.spotlightColumn {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 36%;
+  overflow: hidden;
+  background: #002566;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: 0.1s;
+}
+
+.spotlightColumnVisible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.portrait {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* Left-to-right fade where spotlight meets roster list */
+.spotlightColumn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #001B4D 0%, transparent 22%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.spotlightColumn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, #001B4D 96%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Roster column (left side) ──────────────────────────────────── */
+
+.rosterColumn {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 64%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 0 20px 48px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.sectionLabel {
+  color: #00B4FF;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0 0 4px 0;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.sectionLabelVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.benchLabel {
+  margin-top: 10px;
+}
+
+.rowList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.benchColumns {
+  display: flex;
+  gap: 32px;
+}
+
+/* ── Player row ─────────────────────────────────────────────────── */
+
+.row {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 580px;
+  gap: 0;
+  padding: 5px 10px 5px 0;
+  border-radius: 2px;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.35s ease var(--stagger-delay, 0s),
+              transform 0.35s ease var(--stagger-delay, 0s),
+              background-color 0.2s ease;
+}
+
+.rowVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Highlighted row (current player) — #1A56DB block */
+.rowCurrent {
+  background: #1A56DB;
+  padding-right: 10px;
+  border-radius: 2px;
+}
+
+.rowCurrent .rowNumber,
+.rowCurrent .rowInitial,
+.rowCurrent .rowSurname,
+.rowCurrent .captainBadge {
+  color: #ffffff;
+}
+
+/* Number column — tabular, muted */
+.rowNumber {
+  width: 28px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  margin-right: 10px;
+}
+
+/* GK glove slot */
+.gkSlot {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+}
+
+.gloveIcon {
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Name: "F. SURNAME" format */
+.rowInitial {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.rowSurname {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.captainBadge {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 8px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+}
+
+/* ── Coach block ────────────────────────────────────────────────── */
+
+.coachBlock {
+  position: absolute;
+  z-index: 2;
+  bottom: 24px;
+  left: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.coachLabel {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.coachValue {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 700;
+}

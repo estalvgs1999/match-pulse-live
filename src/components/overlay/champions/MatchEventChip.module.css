@@ -1,0 +1,122 @@
+/* Champions Style — timeout/replay chip.
+   Positioned below the scorebug (top-left), UCL lower-third stacked-bar style. */
+
+.container {
+  position: absolute;
+  top: 152px;  /* 32px top + 64px bar + 22px foul strip + 34px gap */
+  left: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 50;
+  pointer-events: none;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+/* ── Timeout: stacked two-bar lower-third ──────────────────────── */
+
+.timeoutBanner {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  border-radius: 2px;
+  overflow: hidden;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+}
+
+.timeoutBannerVisible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Top bar: label in cyan on very dark navy */
+.timeoutTopBar {
+  background: #001233;
+  padding: 5px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeoutAccentDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #00B4FF;
+  flex-shrink: 0;
+}
+
+.timeoutLabel {
+  color: #00B4FF;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Bottom bar: team name in white on medium navy */
+.timeoutBottomBar {
+  background: #001B4D;
+  padding: 8px 16px;
+}
+
+.timeoutTeam {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Replay pill ───────────────────────────────────────────────── */
+
+.replayPill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #001B4D;
+  border: 1px solid rgba(0, 180, 255, 0.25);
+  padding: 7px 16px;
+  border-radius: 2px;
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+.replayPillVisible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.replayDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00B4FF;
+  animation: blink 1s ease infinite;
+  flex-shrink: 0;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+.replayText {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}

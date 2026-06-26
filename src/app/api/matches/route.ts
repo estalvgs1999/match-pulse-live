@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     date: String(date),
     homeTeamId: resolvedHomeId,
     awayTeamId: resolvedAwayId,
-    overlayTemplate: overlayTemplate === "classic" ? "classic" : "redesigned",
+    overlayTemplate: overlayTemplate === "classic" ? "classic" : overlayTemplate === "champions" ? "champions" : "redesigned",
   };
 
   const { insertedId: matchId } = await db.collection("matches").insertOne(matchDoc);

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const OverlayTemplateSchema = z.enum(["classic", "redesigned"]);
+export const OverlayTemplateSchema = z.enum(["classic", "redesigned", "champions"]);
 export type OverlayTemplate = z.infer<typeof OverlayTemplateSchema>;
 
 export const MatchSchema = z.object({

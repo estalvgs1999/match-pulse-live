@@ -1,0 +1,340 @@
+/* Champions Style — scorebug. Top-left, two-section split (time | teams+score).
+   Inspired by UCL corner widget: time block on left, darker score center. */
+
+.scoreboardWrapper {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  z-index: 50;
+  font-family: var(--font-montserrat), sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ── Main bar wrap — relative container so aggregateTab can overflow right ── */
+
+.mainBarWrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ── Main bar ──────────────────────────────────────────────────── */
+
+.mainBar {
+  display: flex;
+  align-items: stretch;
+  height: 78px;
+  border-radius: 3px;
+  overflow: hidden;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.6));
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.mainBarVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Time section (left, slightly lighter) ─────────────────────── */
+
+.timeSection {
+  background: #002B6E;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  min-width: 90px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 3px;
+}
+
+.periodText {
+  color: #00B4FF;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.timeText {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* ── Team sections ─────────────────────────────────────────────── */
+
+.teamSection {
+  background: #001B4D;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 20px;
+}
+
+.teamSectionRight {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.teamLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.teamLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.teamCode {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── Score section (darkest center) ───────────────────────────── */
+
+.scoreSection {
+  background: #000A2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0 8px;
+  min-width: 92px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scoreNum {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  width: 34px;
+  text-align: center;
+  line-height: 1;
+}
+
+.scoreSep {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 22px;
+  font-weight: 300;
+  margin: 0 3px;
+  line-height: 1;
+}
+
+/* Score flash on goal */
+.scoreSectionPulse {
+  animation: goalPulse 0.5s ease forwards;
+}
+
+@keyframes goalPulse {
+  0%   { background: #000A2E; }
+  35%  { background: #1A56DB; }
+  100% { background: #000A2E; }
+}
+
+/* ── Overtime pill (above bar) ─────────────────────────────────── */
+
+.overtimePanel {
+  position: absolute;
+  bottom: calc(100% + 0px);
+  left: 90px; /* aligns with team section start (after time section width) */
+  background: #1A56DB;
+  border-radius: 3px 3px 0 0;
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.overtimePanelVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.overtimePanelLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.overtimePanelTime {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Red cards (above bar, aligned to team areas) ──────────────── */
+
+.redCardsContainer {
+  position: absolute;
+  top: -18px;
+  left: 90px; /* starts after time section */
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.redCardsContainerVisible {
+  opacity: 1;
+  transition-delay: 0.3s;
+}
+
+.redCardsTeam {
+  display: flex;
+  gap: 4px;
+}
+
+.redCardIcon {
+  width: 10px;
+  height: 14px;
+  background: #ef4444;
+  border-radius: 2px;
+}
+
+/* ── Fouls / penalty bar ───────────────────────────────────────── */
+
+.bottomBar {
+  width: 100%;
+  background: #001233;
+  border-radius: 0 0 3px 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 16px;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s;
+  gap: 10px;
+}
+
+.bottomBarVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bottomBarRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.textLabelCenter {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.pillsContainer {
+  display: flex;
+  gap: 4px;
+}
+
+.foulPill {
+  width: 11px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.foulPillActive {
+  background: #00B4FF;
+}
+
+.penaltyDotsContainer {
+  display: flex;
+  gap: 4px;
+}
+
+.pDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+}
+
+.pDotScored { background: #ffffff; border-color: #ffffff; }
+.pDotMissed { background: #ef4444; border-color: #ef4444; }
+
+/* ── Aggregate tab (right of bar) ──────────────────────────────── */
+
+.aggregateTab {
+  position: absolute;
+  top: 0;
+  right: -82px;
+  width: 74px;
+  height: 78px;
+  background: #001B4D;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0 3px 3px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  filter: drop-shadow(4px 6px 16px rgba(0, 0, 0, 0.4));
+}
+
+.aggregateTabVisible { opacity: 1; }
+
+.aggregateTabLabel {
+  color: #00B4FF;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.aggregateTabScore {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}

@@ -26,6 +26,15 @@ import { StatsScreen as ClassicStatsScreen } from "@/components/overlay/classic/
 import { MatchEventChip as ClassicMatchEventChip } from "@/components/overlay/classic/MatchEventChip";
 import { PreMatchScreen as ClassicPreMatchScreen } from "@/components/overlay/classic/PreMatchScreen";
 
+// Champions template
+import { MainBug as ChampionsMainBug } from "@/components/overlay/champions/MainBug";
+import { HTFTScreen as ChampionsHTFTScreen } from "@/components/overlay/champions/HTFTScreen";
+import { LineupsScreen as ChampionsLineupsScreen } from "@/components/overlay/champions/LineupsScreen";
+import { StandingsScreen as ChampionsStandingsScreen } from "@/components/overlay/champions/StandingsScreen";
+import { StatsScreen as ChampionsStatsScreen } from "@/components/overlay/champions/StatsScreen";
+import { MatchEventChip as ChampionsMatchEventChip } from "@/components/overlay/champions/MatchEventChip";
+import { PreMatchScreen as ChampionsPreMatchScreen } from "@/components/overlay/champions/PreMatchScreen";
+
 const REDESIGNED = {
   MainBug,
   HTFTScreen,
@@ -44,6 +53,16 @@ const CLASSIC = {
   StatsScreen: ClassicStatsScreen,
   MatchEventChip: ClassicMatchEventChip,
   PreMatchScreen: ClassicPreMatchScreen,
+};
+
+const CHAMPIONS = {
+  MainBug: ChampionsMainBug,
+  HTFTScreen: ChampionsHTFTScreen,
+  LineupsScreen: ChampionsLineupsScreen,
+  StandingsScreen: ChampionsStandingsScreen,
+  StatsScreen: ChampionsStatsScreen,
+  MatchEventChip: ChampionsMatchEventChip,
+  PreMatchScreen: ChampionsPreMatchScreen,
 };
 
 export default function OverlayPage({
@@ -65,7 +84,8 @@ export default function OverlayPage({
     return null;
   }
 
-  const C = (info.match.overlayTemplate ?? "redesigned") === "classic" ? CLASSIC : REDESIGNED;
+  const tmpl = info.match.overlayTemplate ?? "redesigned";
+  const C = tmpl === "classic" ? CLASSIC : tmpl === "champions" ? CHAMPIONS : REDESIGNED;
 
   const homeTeam = {
     name: info.homeTeam?.shortName ?? "HOME",

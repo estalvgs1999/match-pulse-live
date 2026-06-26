@@ -1,0 +1,162 @@
+/* Champions Style — match stats. Centered card, semi-transparent navy. */
+
+.wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 960px;
+  transform: translate(-50%, -50%) scale(0.96);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  pointer-events: none;
+  font-family: var(--font-montserrat), sans-serif;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(0, 15, 46, 0.94);
+  border: 1px solid rgba(0, 180, 255, 0.15);
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.65));
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+}
+
+.wrapperVisible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.header {
+  background: #002B6E;
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 36px;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.headerTeam {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.headerTeamRight {
+  flex-direction: row-reverse;
+}
+
+.logoWrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.logoWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.headerTeamName {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.headerLabel {
+  color: #00B4FF;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+
+.body {
+  padding: 22px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+/* ── Stat row ───────────────────────────────────────────────────── */
+
+.statRow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px 0;
+}
+
+.statRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statValue {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  min-width: 44px;
+  text-align: center;
+}
+
+.statLabel {
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  flex: 1;
+}
+
+.statBarRow {
+  display: flex;
+  align-items: center;
+}
+
+.statBarTrack {
+  flex: 1;
+  display: flex;
+  height: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.statBarHome {
+  height: 100%;
+  border-radius: 2px 0 0 2px;
+  transition: width 0.5s ease;
+}
+
+.statBarAway {
+  height: 100%;
+  flex: 1;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.5s ease;
+}

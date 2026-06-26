@@ -1,0 +1,219 @@
+/* Champions Style — standings/bracket. Centered floating card.
+   Semi-transparent navy with thin cyan border, headers in cyan. */
+
+.wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 560px;
+  max-height: 780px;
+  transform: translate(-50%, -50%) scale(0.96);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  pointer-events: none;
+  font-family: var(--font-montserrat), sans-serif;
+  border-radius: 3px;
+  overflow: hidden;
+  /* Semi-transparent so pitch is visible behind in OBS */
+  background: rgba(0, 15, 46, 0.92);
+  border: 1px solid rgba(0, 180, 255, 0.18);
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.6));
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+}
+
+.wrapperVisible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.header {
+  background: #002B6E;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.headerLabel {
+  color: #00B4FF;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+}
+
+.headerTournament {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+
+.body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* League table */
+.tableHeader {
+  display: grid;
+  grid-template-columns: 24px 1fr 36px 36px 36px 36px 44px;
+  gap: 6px;
+  padding: 0 8px 8px 8px;
+  border-bottom: 1px solid rgba(0, 180, 255, 0.12);
+  margin-bottom: 4px;
+}
+
+.colHead {
+  color: #00B4FF;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.colHeadTeam {
+  text-align: left;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 24px 1fr 36px 36px 36px 36px 44px;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 8px;
+  border-radius: 2px;
+}
+
+.tableRow:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.rowPos {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.rowTeam {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.rowStat {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.rowPts {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bracket */
+.bracketContainer {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  align-items: flex-start;
+  padding: 8px 0;
+}
+
+.bracketRound {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-width: 200px;
+}
+
+.roundLabel {
+  color: #00B4FF;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 12px 10px 12px;
+  margin: 0;
+}
+
+.roundMatchups {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  gap: 12px;
+  padding: 0 6px;
+}
+
+.matchup {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(0, 180, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.matchupTeam {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.matchupTeam:last-child {
+  border-bottom: none;
+}
+
+.matchupTeamName {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.matchupScore {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+.matchupScoreNull {
+  color: rgba(255, 255, 255, 0.18);
+}
