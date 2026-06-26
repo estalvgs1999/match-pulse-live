@@ -12,13 +12,15 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        # Baked into the client bundle at build time — changing these requires rebuild.
+        # NEXT_PUBLIC_* vars are baked into the client bundle at build time.
+        # Changing them requires a rebuild: docker compose up -d --build app
         NEXT_PUBLIC_PUSHER_KEY: ${PUSHER_KEY}
         NEXT_PUBLIC_PUSHER_CLUSTER: ${PUSHER_CLUSTER}
     image: matchpulse-live:latest
     ports:
       - "${APP_PORT:-4000}:3000"
     environment:
+      # Points to the local mongo service — no external database needed.
       MONGODB_URI: mongodb://mongo:27017/matchpulse
       MONGODB_DB: matchpulse
       PUSHER_APP_ID: ${PUSHER_APP_ID}

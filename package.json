@@ -9,8 +9,11 @@
     "lint": "eslint",
     "seed": "node --env-file=.env.local scripts/seed.mjs",
     "seed:docker": "MONGODB_URI=mongodb://localhost:27017/matchpulse MONGODB_DB=matchpulse node scripts/seed.mjs",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
     "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up -V",
-    "docker:dev:build": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -V"
+    "docker:dev:build": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -V",
+    "docker:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build"
   },
   "dependencies": {
     "framer-motion": "^12.40.0",

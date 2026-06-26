@@ -1,3 +1,6 @@
+# Development override — use with: npm run docker:dev
+# Replaces the production build with a hot-reload server.
+# Inherits the mongo service from docker-compose.yml.
 services:
   app:
     build:
@@ -6,14 +9,13 @@ services:
     image: matchpulse-live:dev
     volumes:
       - .:/app
-      # Volúmenes anónimos para que node_modules y .next no sean sobreescritos
-      # por el bind mount del host (evita conflictos entre binarios macOS/Linux).
+      # Anonymous volumes prevent the host's node_modules and .next from
+      # overwriting the container's (avoids macOS/Linux binary conflicts).
       - /app/node_modules
       - /app/.next
     environment:
-      # En dev, next dev lee NEXT_PUBLIC_* del entorno en tiempo de ejecución.
+      # In dev mode, Next.js reads NEXT_PUBLIC_* at runtime (no build step).
       NEXT_PUBLIC_PUSHER_KEY: ${PUSHER_KEY}
       NEXT_PUBLIC_PUSHER_CLUSTER: ${PUSHER_CLUSTER}
-      # Polling necesario para que los file-watchers funcionen sobre bind mounts
-      # en Docker Desktop / macOS (inotify no propaga correctamente).
+      # Required for file-watchers to work over Docker Desktop bind mounts on macOS.
       WATCHPACK_POLLING: "true"

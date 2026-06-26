@@ -1,177 +1,169 @@
 # Setup Guide
 
-This guide gets MatchPulse Live running end-to-end: credentials, Docker, and your first match in OBS.
+MatchPulse Live runs as a Docker stack. This guide covers **local setup** — app + MongoDB running together on your machine.
+
+For self-hosted production deployment (Atlas + VPS), see [deployment.md](deployment.md).
 
 **Time to complete:** ~10 minutes
 
 ---
 
-## Prerequisites
+## What you need
 
-| Tool | Minimum | Check |
-|------|---------|-------|
-| Docker Desktop | 4.x | `docker --version` |
-| Docker Compose | V2 | `docker compose version` |
-| Git | any | `git --version` |
+| Requirement | Notes |
+|-------------|-------|
+| [Docker Desktop](https://docs.docker.com/get-docker/) | Version 4.x or later |
+| [Pusher Channels account](https://pusher.com/channels) | Free tier — 100 connections, 200k messages/day |
 
-You also need two free cloud accounts (no credit card required):
-
-- **[Pusher Channels](https://pusher.com/channels)** — the real-time WebSocket layer. Free tier: 100 concurrent connections, 200k messages/day.
-- **[MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)** — the database. Free M0 cluster is permanent.
+> MongoDB runs locally inside Docker. **No Atlas account required for local setup.**
 
 ---
 
-## Step 1 — Pusher Channels
+## 1. Get your Pusher credentials
 
-1. Create an account at [pusher.com/channels](https://pusher.com/channels)
-2. Create a new **Channels** app — any name, any cluster (pick the one closest to you geographically)
-3. Open **App Keys**
+1. Sign up at [pusher.com/channels](https://pusher.com/channels)
+2. Create a new **Channels** app — any name, pick the cluster closest to you
+3. Open the **App Keys** tab
 
-<!-- SCREENSHOT: Pusher dashboard → App Keys tab showing app_id, key, secret, cluster -->
-> 📸 *Screenshot placeholder — paste your Pusher App Keys screen here*
+<!-- SCREENSHOT: Pusher App Keys tab -->
+> 📸 *Screenshot — Pusher App Keys (app_id, key, secret, cluster)*
 
-Keep this tab open. You'll need `app_id`, `key`, `secret`, and `cluster` in Step 3.
-
----
-
-## Step 2 — MongoDB Atlas
-
-1. Create an account at [mongodb.com/atlas](https://www.mongodb.com/cloud/atlas/register)
-2. Create a free **M0** cluster (any region)
-3. Under **Database Access** → Add database user → Username + Password (not OAuth)
-4. Under **Network Access** → Add IP Address → `0.0.0.0/0` (allow from anywhere)
-5. Click **Connect → Drivers → Copy connection string**
-
-<!-- SCREENSHOT: Atlas "Connect" modal showing the connection string -->
-> 📸 *Screenshot placeholder — paste the Atlas connection string modal here*
-
-The string looks like:
-```
-mongodb+srv://youruser:yourpassword@cluster0.xxxxx.mongodb.net/
-```
+Keep this tab open. You'll paste these values in the next step.
 
 ---
 
-## Step 3 — Clone and configure
+## 2. Clone and configure
 
 ```bash
 git clone https://github.com/estalvgs1999/match-pulse-live.git
 cd match-pulse-live
 ```
 
-**Option A — Interactive installer (recommended):**
+**Option A — Installer (recommended):**
 ```bash
 bash install.sh
 ```
-The script prompts for each credential, writes `.env`, builds the image, and starts the stack.
+Walks you through each credential, writes `.env`, builds the image, and starts the stack.
 
 **Option B — Manual:**
 ```bash
 cp .env.example .env
 ```
-Then open `.env` and fill in:
+Open `.env` and fill in:
 
 ```env
-MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/matchpulse
-MONGODB_DB=matchpulse
+PUSHER_APP_ID=        ← from Pusher App Keys
+PUSHER_KEY=           ←
+PUSHER_SECRET=        ←
+PUSHER_CLUSTER=       ← e.g. us2, eu, ap1
 
-PUSHER_APP_ID=        # from Pusher App Keys
-PUSHER_KEY=           # from Pusher App Keys
-PUSHER_SECRET=        # from Pusher App Keys
-PUSHER_CLUSTER=       # e.g. us2, eu, ap3
+NEXT_PUBLIC_PUSHER_KEY=       ← same as PUSHER_KEY
+NEXT_PUBLIC_PUSHER_CLUSTER=   ← same as PUSHER_CLUSTER
 
-NEXT_PUBLIC_PUSHER_KEY=       # same as PUSHER_KEY
-NEXT_PUBLIC_PUSHER_CLUSTER=   # same as PUSHER_CLUSTER
-
-CONTROL_PASSWORD=     # any password you choose for the operator login
+CONTROL_PASSWORD=     ← choose a password for the operator login
 ```
+
+> `MONGODB_URI` can stay blank for local — Docker Compose provides the connection to the local MongoDB container.
 
 ---
 
-## Step 4 — Build and start
+## 3. Start
 
 ```bash
 docker compose up -d --build
 ```
 
-First build takes 2–3 minutes. Subsequent starts take a few seconds.
+First build: ~3 minutes. Subsequent starts: a few seconds.
 
-<!-- SCREENSHOT: terminal showing docker compose build completing -->
-> 📸 *Screenshot placeholder — terminal after successful docker compose up*
-
-> **Note:** `NEXT_PUBLIC_*` variables are compiled into the browser bundle. If you change Pusher credentials later, you need to rebuild: `docker compose up -d --build app`.
+<!-- SCREENSHOT: Terminal after successful docker compose up -->
+> 📸 *Screenshot — terminal showing stack started*
 
 ---
 
-## Step 5 — First login
+## 4. Open the dashboard
 
-Open [http://localhost:4000/dashboard](http://localhost:4000/dashboard)
+Go to **[http://localhost:4000/dashboard](http://localhost:4000/dashboard)**
 
-You'll be redirected to the login page. Enter the `CONTROL_PASSWORD` you set.
+You'll be redirected to login. Enter the `CONTROL_PASSWORD` you set.
 
-<!-- SCREENSHOT: MatchPulse login screen -->
-> 📸 *Screenshot placeholder — login page*
+<!-- SCREENSHOT: Login screen -->
+> 📸 *Screenshot — login page*
 
-<!-- SCREENSHOT: Dashboard after login, showing empty match list with "New Match" button -->
-> 📸 *Screenshot placeholder — empty dashboard*
+<!-- SCREENSHOT: Empty dashboard -->
+> 📸 *Screenshot — dashboard*
 
 ---
 
-## Step 6 — Load demo data (optional)
+## 5. Load demo data (optional)
 
-To explore with pre-built teams and a sample match:
+Creates two teams and a sample match to explore the interface:
 
 ```bash
 npm run seed:docker
 ```
 
-This creates two teams and one match. The match ID is printed in the output.
-
-<!-- SCREENSHOT: Dashboard after seed — match card visible -->
-> 📸 *Screenshot placeholder — dashboard with demo match*
+<!-- SCREENSHOT: Dashboard with demo match card -->
+> 📸 *Screenshot — dashboard with demo match*
 
 ---
 
-## Step 7 — Add to OBS
+## 6. Connect to OBS
 
-1. Click the **monitor icon** on any match card to open the OBS connection modal
+1. Click the **monitor icon** on a match card to open the OBS modal
 2. Copy the overlay URL
 
-<!-- SCREENSHOT: OBS modal with URL and copy button -->
-> 📸 *Screenshot placeholder — OBS connection modal*
+<!-- SCREENSHOT: OBS connection modal -->
+> 📸 *Screenshot — OBS modal with URL*
 
-3. In OBS, add a **Browser Source**:
+3. In OBS → **Add Source → Browser Source**:
    - URL: paste the overlay URL
    - Width: `1920` / Height: `1080`
    - Custom CSS: leave empty
-4. Place the browser source **above** your video capture layer
+4. Place it **above** your video capture layer
 
-<!-- SCREENSHOT: OBS source list showing browser source above video capture -->
-> 📸 *Screenshot placeholder — OBS source configuration*
+<!-- SCREENSHOT: OBS source list -->
+> 📸 *Screenshot — OBS browser source configured*
 
 ---
 
-## Remote access (ngrok)
+## Development mode (hot reload)
 
-To operate from a different network or broadcast from a venue:
+To run with live file reloading instead of a production build:
+
+```bash
+npm run docker:dev
+```
+
+Changes to source files are picked up immediately inside the container. Useful during theme development or feature work.
+
+To rebuild after changing `package.json`:
+```bash
+npm run docker:dev:build
+```
+
+---
+
+## Remote access
+
+To control OBS from a different network or venue:
 
 ```bash
 ngrok http 4000 --request-header-add "ngrok-skip-browser-warning: any"
 ```
 
-Use the ngrok `https://` URL in OBS. Share the `/control/[matchId]` URL with any additional operators.
+Use the ngrok `https://` URL in OBS. Share the `/control/[matchId]` URL with co-operators.
 
 ---
 
 ## Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---------|-------------|-----|
-| Overlay doesn't update | Pusher credentials wrong | Check `PUSHER_KEY` / `PUSHER_CLUSTER` in `.env` and rebuild |
-| Clock drifts on OBS reload | — | This shouldn't happen — open an issue if it does |
-| `ECONNREFUSED` on start | MongoDB URI wrong | Verify Atlas IP allowlist and connection string |
-| Port 4000 already in use | Another service | Set `APP_PORT=4001` in `.env` |
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Overlay doesn't update in real time | Pusher credentials incorrect | Check keys in `.env`, rebuild with `docker compose up -d --build app` |
+| `Connection refused` on start | Port conflict | Change `APP_PORT=4001` in `.env` |
+| Stack starts but login fails | Wrong password | Check `CONTROL_PASSWORD` in `.env` |
+| OBS overlay blank | Wrong URL or stack not running | Verify `docker compose ps` shows app running |
 
 ---
 
-**Next:** [Operator Guide →](usage.md)
+**Next:** [Operator Guide →](usage.md) · [Production Deployment →](deployment.md)

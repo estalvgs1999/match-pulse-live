@@ -1,0 +1,19 @@
+# Production deployment override — use with:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Differences from the base docker-compose.yml:
+#   - No local mongo service (uses MongoDB Atlas via MONGODB_URI)
+#   - MONGODB_URI read from the environment / .env file
+#   - restart: always (instead of unless-stopped)
+services:
+  app:
+    environment:
+      MONGODB_URI: ${MONGODB_URI}      # Atlas connection string — required
+      MONGODB_DB: ${MONGODB_DB:-matchpulse}
+    depends_on: {}                     # Remove local mongo dependency
+    restart: always
+
+  # Disable the local mongo service in production.
+  mongo:
+    profiles:
+      - local-only

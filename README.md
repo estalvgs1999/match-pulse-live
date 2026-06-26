@@ -1,5 +1,3 @@
-<!-- BANNER — replace with your generated image -->
-<!-- Gemini prompt to generate one: see docs/banner-prompt.md -->
 <p align="center">
   <img src="docs/assets/banner.png" alt="MatchPulse Live" width="100%" />
 </p>
@@ -26,9 +24,9 @@
 ---
 
 <p align="center">
-  <a href="docs/setup.md"><b>Setup Guide</b></a> ·
+  <a href="docs/setup.md"><b>Local Setup</b></a> ·
+  <a href="docs/deployment.md"><b>Deployment</b></a> ·
   <a href="docs/usage.md"><b>Operator Guide</b></a> ·
-  <a href="#quick-install"><b>Quick Install</b></a> ·
   <a href="#overlay-templates"><b>Templates</b></a>
 </p>
 
@@ -38,15 +36,13 @@
 
 **A control panel.** Open it on any browser — desktop, tablet, or phone. Manage the live clock, score, cards, lineups, standings, and which graphic is on air. Multiple operators can connect simultaneously.
 
-**A broadcast overlay.** Add it to OBS as a Browser Source (1920×1080, transparent). It updates within ~100 ms of every operator action, with smooth animated transitions. The clock never drifts — it's anchored to the server, not the client.
+**A broadcast overlay.** Add it to OBS as a Browser Source (1920×1080, transparent). It updates within ~100 ms of every operator action, with smooth animated transitions. The clock is server-anchored and never drifts.
 
-**Three visual templates.** Swap between *Redesigned*, *Classic*, and *Champions* per match. Or generate an entirely new theme from a reference image with one command.
+**Three visual templates.** Switch between *Redesigned*, *Classic*, and *Champions* per match. Generate new themes from a reference image with one command.
 
 ---
 
-## Quick Install
-
-> Requires: Docker, a [Pusher Channels](https://pusher.com/channels) account (free), and a MongoDB connection string (Atlas free tier or local).
+## Quick Start
 
 ```bash
 git clone https://github.com/estalvgs1999/match-pulse-live.git
@@ -54,9 +50,9 @@ cd match-pulse-live
 bash install.sh
 ```
 
-The installer walks you through credentials, builds the Docker image, and opens the dashboard.
+Requires: Docker + a free [Pusher Channels](https://pusher.com/channels) account. MongoDB runs locally in Docker — no Atlas needed for local setup.
 
-**→ Full setup walkthrough: [docs/setup.md](docs/setup.md)**
+→ **[Full setup guide](docs/setup.md)** · **[Production deployment](docs/deployment.md)**
 
 ---
 
@@ -68,16 +64,20 @@ The installer walks you through credentials, builds the Docker image, and opens 
 | 📺 | **Classic** | Broadcast green; clean rectangular scorebug |
 | 🏆 | **Champions** | UCL-inspired; deep navy; cyan accent; split-section widget |
 
-Add a custom theme from any reference image:
+Add a custom theme from a reference image:
 ```
 /new-overlay-theme "Copa MX" paleta dorada, tipografía condensada
 ```
 
 ---
 
-## Operator Guide
+## Documentation
 
-**→ [docs/usage.md](docs/usage.md)** — step-by-step guide to running a live match.
+| | |
+|-|-|
+| [Local Setup](docs/setup.md) | Docker stack, Pusher credentials, OBS connection |
+| [Production Deployment](docs/deployment.md) | Atlas + VPS, HTTPS, updates |
+| [Operator Guide](docs/usage.md) | Running a match from start to finish |
 
 ---
 
