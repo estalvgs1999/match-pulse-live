@@ -1,10 +1,9 @@
 "use client";
 
 import { Suspense, useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
 
@@ -29,8 +28,7 @@ function LoginForm() {
       return;
     }
 
-    router.push(next);
-    router.refresh();
+    window.location.href = next;
   }
 
   return (
