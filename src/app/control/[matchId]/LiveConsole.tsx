@@ -32,6 +32,7 @@ export function LiveConsole({ matchId }: { matchId: string }) {
   const [standingsEditorOpen, setStandingsEditorOpen] = useState(false);
   const [statsEditorOpen, setStatsEditorOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [obsOpen, setObsOpen] = useState(false);
 
   useEffect(() => {
     const update = () => setWallClock(new Date().toLocaleTimeString("en-GB"));
@@ -391,14 +392,25 @@ export function LiveConsole({ matchId }: { matchId: string }) {
               <span className="text-on-surface-variant">{info.match.matchday}</span>
             </nav>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettingsOpen(true)}
-            aria-label="Match settings"
-            className="w-9 h-9 rounded-full bg-surface-container-highest border border-outline-variant text-on-surface-variant flex items-center justify-center hover:text-primary transition-colors"
-          >
-            <span className="material-symbols-outlined text-lg">settings</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setObsOpen(true)}
+              aria-label="Conexión OBS"
+              className="flex items-center gap-1.5 px-3 h-9 rounded-full bg-surface-container-highest border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary transition-colors text-xs font-bold"
+            >
+              <span className="material-symbols-outlined text-base">monitor</span>
+              <span className="hidden sm:inline">OBS</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSettingsOpen(true)}
+              aria-label="Match settings"
+              className="w-9 h-9 rounded-full bg-surface-container-highest border border-outline-variant text-on-surface-variant flex items-center justify-center hover:text-primary transition-colors"
+            >
+              <span className="material-symbols-outlined text-lg">settings</span>
+            </button>
+          </div>
         </header>
 
         <div className="p-4 flex-1 lg:min-h-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 lg:overflow-y-auto custom-scrollbar">
@@ -601,6 +613,70 @@ export function LiveConsole({ matchId }: { matchId: string }) {
         onGoLive={() => patch({ activeGraphic: "stats" })}
         isLive={state.activeGraphic === "stats"}
       />
+
+      {obsOpen && <OBSModal matchId={matchId} onClose={() => setObsOpen(false)} />}
+    </div>
+  );
+}
+
+function OBSModal({ matchId, onClose }: { matchId: string; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const url =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/overlay/${matchId}`
+      : `/overlay/${matchId}`;
+
+  function copy() {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70" onClick={onClose}>
+      <div className="obsidian-card rounded-xl w-full max-w-md p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-bold text-on-surface text-lg">Conexión OBS</h2>
+            <p className="text-xs text-on-surface-variant mt-0.5">
+              Agrega esta URL como Browser Source en OBS
+            </p>
+          </div>
+          <button onClick={onClose} className="text-on-surface-variant hover:text-on-surface transition-colors">
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+        <div className="bg-surface-container-highest rounded-lg p-3 font-mono text-xs text-on-surface break-all">
+          {url}
+        </div>
+        <div className="space-y-2 text-xs text-on-surface-variant">
+          <p className="flex items-start gap-2">
+            <span className="material-symbols-outlined text-base text-primary flex-shrink-0">monitor</span>
+            Resolución recomendada: <strong className="text-on-surface">1920 × 1080</strong>
+          </p>
+          <p className="flex items-start gap-2">
+            <span className="material-symbols-outlined text-base text-primary flex-shrink-0">layers</span>
+            Activa <strong className="text-on-surface">"Control audio via OBS"</strong> y desactiva el fondo
+            personalizado para transparencia total.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={copy}
+            className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-container text-on-primary font-bold py-2.5 rounded-lg text-sm transition-colors"
+          >
+            <span className="material-symbols-outlined text-base">{copied ? "check" : "content_copy"}</span>
+            {copied ? "¡Copiado!" : "Copiar URL"}
+          </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 border border-outline-variant text-on-surface-variant hover:text-on-surface rounded-lg text-sm transition-colors"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
