@@ -56,6 +56,28 @@ function OBSHeaderButton({ matchId, onClick }: { matchId: string; onClick: () =>
   );
 }
 
+function OBSFooterStatus({ matchId }: { matchId: string }) {
+  const obsConnected = useObsStatus(matchId);
+  return (
+    <span className="flex items-center gap-2">
+      {obsConnected === null ? (
+        <span className="w-1.5 h-1.5 rounded-full bg-outline animate-pulse" />
+      ) : obsConnected ? (
+        <span className="relative flex w-1.5 h-1.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75" />
+          <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-tertiary" />
+        </span>
+      ) : (
+        <span className="w-1.5 h-1.5 rounded-full bg-error" />
+      )}
+      OBS:{" "}
+      <span className={obsConnected ? "text-tertiary" : obsConnected === false ? "text-error" : ""}>
+        {obsConnected === null ? "Verificando" : obsConnected ? "Conectado" : "Desconectado"}
+      </span>
+    </span>
+  );
+}
+
 const NAV_ITEMS = [
   { icon: "dashboard", label: "Dashboard", active: false, href: "/dashboard" },
   { icon: "groups", label: "Teams", active: false, href: "/dashboard/teams" },
@@ -575,9 +597,7 @@ export function LiveConsole({ matchId }: { matchId: string }) {
         {/* DESKTOP FOOTER */}
         <footer className="hidden lg:flex h-10 bg-surface-container-low border-t border-outline-variant px-6 items-center justify-between text-[10px] font-bold text-on-surface-variant tracking-wider uppercase">
           <div className="flex gap-6">
-            <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-outline" /> OBS Websocket: Not connected
-            </span>
+            <OBSFooterStatus matchId={matchId} />
           </div>
           <div className="flex gap-6">
             <span>{wallClock}</span>
