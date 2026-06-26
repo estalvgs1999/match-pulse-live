@@ -1,0 +1,27 @@
+# Drop screenshots and the banner here.
+#
+# Naming convention used in docs/setup.md and docs/usage.md:
+#   banner.png              — README hero banner (1920×480)
+#   setup-pusher-keys.png   — Pusher App Keys tab
+#   setup-atlas-connect.png — Atlas connection string modal
+#   setup-docker-build.png  — Terminal after docker compose up
+#   setup-login.png         — Login screen
+#   setup-dashboard.png     — Dashboard after first login
+#   setup-dashboard-seed.png— Dashboard with demo match
+#   setup-obs-modal.png     — OBS connection modal
+#   setup-obs-source.png    — OBS source list
+#   usage-newmatch.png      — New match form
+#   usage-obs-overlay.png   — OBS with overlay over pitch
+#   usage-control-desktop.png — Full control panel desktop
+#   usage-control-mobile.png  — Control panel mobile
+#   usage-clock.png         — Clock module running
+#   usage-matchflow.png     — Match Flow panel
+#   usage-scorer-modal.png  — Goal scorer modal
+#   usage-graphic-selector.png — Graphic selector panel
+#   usage-lineup-editor.png — Lineup editor modal
+#   usage-lineups-overlay.png  — Lineups screen on overlay
+#   usage-penalty-grid.png  — Penalty grid
+#   usage-timeout-chip.png  — Timeout chip on overlay
+#   usage-standings.png     — Standings editor
+#   usage-settings.png      — Match settings modal
+#   usage-scorebug-agg.png  — Scorebug with AGG tab
