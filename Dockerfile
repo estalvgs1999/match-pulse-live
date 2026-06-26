@@ -1,5 +1,3 @@
-# syntax=docker.io/docker/dockerfile:1
-
 # 1. Dependencies
 FROM node:22-alpine AS deps
 WORKDIR /app
