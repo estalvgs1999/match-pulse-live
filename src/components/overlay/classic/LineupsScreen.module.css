@@ -1,0 +1,372 @@
+/* Full-width takeover, colored from the displayed team's own colors
+   (see --lineup-accent/primary/dark, set inline in LineupsScreen.tsx)
+   rather than a hardcoded palette — each team's Lineups screen looks like
+   their own broadcast package. Safety margins: fixed at 630px total
+   (header 96 + body 534), leaving ~21% clear above and below on the
+   1080px canvas regardless of roster size. The container does NOT grow
+   for a longer roster — the interior (row/label sizing) is compact
+   enough to fit ~15 players inside that fixed height instead, with
+   overflow:hidden as a last-resort clip for anything beyond that. */
+
+.wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1820px;
+  max-height: 630px;
+  transform: translate(-50%, -50%) scale(0.96);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  pointer-events: none;
+  font-family: var(--font-montserrat), sans-serif;
+  border-radius: 28px;
+  overflow: hidden;
+  filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.5));
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+}
+
+.wrapperVisible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+.header {
+  background: linear-gradient(100deg, var(--lineup-accent) 0%, var(--lineup-primary) 100%);
+  height: 96px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 56px;
+  box-sizing: border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.logoWrapper {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.logoWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.teamName {
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Team-colored gradient with soft decorative shapes for depth — the
+   "textured background" called out explicitly, not a flat fill. Fixed
+   height, not content-driven — see the .wrapper comment for why.
+
+   .spotlightColumn is taken OUT of normal flow (position: absolute)
+   instead of being a flex sibling. Reason: an <img height:100%> inside an
+   auto-height flex container can't resolve that percentage during the
+   browser's hypothetical-size pass, so it silently falls back to the
+   image's own intrinsic aspect ratio at its resolved width — for a tall
+   portrait photo that's ~930px, which dragged the whole card up to the
+   900px safety cap regardless of how few players were in the list. An
+   absolutely-positioned photo doesn't participate in that sizing pass at
+   all: roster content alone determines .body's height, and the photo
+   (top/bottom: 0) just fills whatever that turns out to be, after the
+   fact — same visual result, no circular sizing. */
+.body {
+  position: relative;
+  background: linear-gradient(155deg, var(--lineup-accent) 0%, var(--lineup-primary) 45%, var(--lineup-dark) 100%);
+  height: 534px;
+  display: flex;
+  padding: 0 56px 0 calc(40% + 40px);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.shape1,
+.shape2,
+.shape3 {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.shape1 {
+  width: 340px;
+  height: 340px;
+  top: -120px;
+  right: -60px;
+}
+
+.shape2 {
+  width: 180px;
+  height: 180px;
+  bottom: -60px;
+  right: 260px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.shape3 {
+  width: 90px;
+  height: 90px;
+  top: 60%;
+  right: 80px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  transform: rotate(20deg);
+}
+
+/* 40% of the panel width per spec, flush against the top/bottom/left
+   edges of the card so the photo reads as large as the space allows
+   rather than floating in an inset box. See .body comment for why this
+   is absolutely positioned instead of a flex sibling. */
+.spotlightColumn {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: 0.1s;
+}
+
+.spotlightColumnVisible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Sized by HEIGHT, not width — fills the column's full height (so the
+   photo is never cropped down to a thin zoomed-in sliver in a short, wide
+   box) and lets width be whatever the photo's own aspect ratio yields,
+   centered. The opposite of width:100%/height:100%, which forced a heavy
+   vertical crop whenever the column was wider than it was tall. */
+.portrait {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  max-width: none;
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* Fades the photo's bottom edge into the body's own background color
+   instead of cutting it off sharply — same tone as .body's darkest stop. */
+.spotlightColumn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, var(--lineup-dark) 97%);
+  pointer-events: none;
+}
+
+.rosterColumn {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.sectionLabel {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0 0 4px 0;
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.sectionLabelVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.benchLabel {
+  margin-top: 10px;
+}
+
+.rowList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Bench splits into two side-by-side columns instead of one long list —
+   halves the vertical space a long bench needs, freeing up room for
+   bigger, more legible row text within the fixed-height card. */
+.benchColumns {
+  display: flex;
+  gap: 32px;
+}
+
+/* Staggered entrance — each row fades/slides in with its own delay (set
+   inline per-row, see LineupsScreen.tsx) instead of the whole list
+   appearing at once, so the reveal reads as a deliberate build-up. Tied
+   to the same `visible` prop as the wrapper, so it replays every time the
+   graphic is shown, not just on first mount. */
+/* Content-sized, not stretched to the column's full width — otherwise
+   the .rowCurrent highlight reads as an oversized bar reaching almost to
+   the Head Coach corner instead of a tight pill around the name. The
+   14px right padding is the "slightly wider than the name" margin;
+   max-width is a hard backstop so even a long name can't visually
+   approach the coach block. */
+.row {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 480px;
+  gap: 14px;
+  padding: 4px 14px;
+  border-radius: 6px;
+  opacity: 0;
+  transform: translateX(-16px);
+  /* background-color deliberately has NO delay, unlike opacity/transform
+     (which use --stagger-delay for the one-time entrance reveal, set
+     inline per row in LineupsScreen.tsx). A single `transition-delay`
+     shared across the whole `transition` shorthand was applying that same
+     entrance stagger to the live current-player highlight too — on a
+     bench row with e.g. a 0.4s stagger, the highlight transition didn't
+     even START until 0.4s into its 0.7s-long active window, so it never
+     fully appeared before the scan moved to the next player. */
+  transition: opacity 0.4s ease var(--stagger-delay, 0s), transform 0.4s ease var(--stagger-delay, 0s),
+    background-color 0.25s ease;
+}
+
+.rowVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.rowCurrent {
+  background-color: #ffffff;
+}
+
+.rowCurrent .rowFirstName,
+.rowCurrent .rowSurname,
+.rowCurrent .rowNumber,
+.rowCurrent .gloveIcon,
+.rowCurrent .captainBadge {
+  color: var(--lineup-dark);
+}
+
+.rowCurrent .captainBadge {
+  border-color: var(--lineup-dark);
+}
+
+.gkSlot {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gloveIcon {
+  width: 18px;
+  height: 18px;
+  color: #ffffff;
+}
+
+.rowNumber {
+  width: 24px;
+  flex-shrink: 0;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rowName {
+  font-size: 17px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rowFirstName {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.rowSurname {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.captainBadge {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coachBlock {
+  position: absolute;
+  z-index: 1;
+  bottom: 40px;
+  right: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.coachLabel {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.coachValue {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+}

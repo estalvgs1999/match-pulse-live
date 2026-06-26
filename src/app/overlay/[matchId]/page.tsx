@@ -6,6 +6,9 @@ import { useMatchState } from "@/hooks/useMatchState";
 import { useServerOffset } from "@/hooks/useServerOffset";
 import { useMatchClock } from "@/hooks/useMatchClock";
 import { usePlayerEventChip } from "@/hooks/usePlayerEventChip";
+import { DEFAULT_CLOCK } from "@/models/MatchState";
+
+// Redesigned template
 import { MainBug } from "@/components/overlay/MainBug";
 import { HTFTScreen } from "@/components/overlay/HTFTScreen";
 import { LineupsScreen } from "@/components/overlay/LineupsScreen";
@@ -13,7 +16,35 @@ import { StandingsScreen } from "@/components/overlay/StandingsScreen";
 import { StatsScreen } from "@/components/overlay/StatsScreen";
 import { MatchEventChip } from "@/components/overlay/MatchEventChip";
 import { PreMatchScreen } from "@/components/overlay/PreMatchScreen";
-import { DEFAULT_CLOCK } from "@/models/MatchState";
+
+// Classic template
+import { MainBug as ClassicMainBug } from "@/components/overlay/classic/MainBug";
+import { HTFTScreen as ClassicHTFTScreen } from "@/components/overlay/classic/HTFTScreen";
+import { LineupsScreen as ClassicLineupsScreen } from "@/components/overlay/classic/LineupsScreen";
+import { StandingsScreen as ClassicStandingsScreen } from "@/components/overlay/classic/StandingsScreen";
+import { StatsScreen as ClassicStatsScreen } from "@/components/overlay/classic/StatsScreen";
+import { MatchEventChip as ClassicMatchEventChip } from "@/components/overlay/classic/MatchEventChip";
+import { PreMatchScreen as ClassicPreMatchScreen } from "@/components/overlay/classic/PreMatchScreen";
+
+const REDESIGNED = {
+  MainBug,
+  HTFTScreen,
+  LineupsScreen,
+  StandingsScreen,
+  StatsScreen,
+  MatchEventChip,
+  PreMatchScreen,
+};
+
+const CLASSIC = {
+  MainBug: ClassicMainBug,
+  HTFTScreen: ClassicHTFTScreen,
+  LineupsScreen: ClassicLineupsScreen,
+  StandingsScreen: ClassicStandingsScreen,
+  StatsScreen: ClassicStatsScreen,
+  MatchEventChip: ClassicMatchEventChip,
+  PreMatchScreen: ClassicPreMatchScreen,
+};
 
 export default function OverlayPage({
   params,
@@ -34,6 +65,8 @@ export default function OverlayPage({
     return null;
   }
 
+  const C = (info.match.overlayTemplate ?? "redesigned") === "classic" ? CLASSIC : REDESIGNED;
+
   const homeTeam = {
     name: info.homeTeam?.shortName ?? "HOME",
     logoUrl: info.homeTeam?.logoUrl,
@@ -52,7 +85,7 @@ export default function OverlayPage({
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: "transparent" }}>
-      <MainBug
+      <C.MainBug
         visible={state.activeGraphic === "bug"}
         mode={state.gameMode}
         period={state.period}
@@ -73,7 +106,7 @@ export default function OverlayPage({
         aggregateHomeScore={state.aggregateHomeScore}
         aggregateAwayScore={state.aggregateAwayScore}
       />
-      <HTFTScreen
+      <C.HTFTScreen
         visible={state.activeGraphic === "htft"}
         title={state.htftTitle}
         homeTeam={homeTeamFull}
@@ -83,7 +116,7 @@ export default function OverlayPage({
         homeScorers={state.scorers.home}
         awayScorers={state.scorers.away}
       />
-      <LineupsScreen
+      <C.LineupsScreen
         visible={state.activeGraphic === "lineups"}
         team={state.lineupSide === "home" ? info.homeTeam : info.awayTeam}
         startingNumbers={state.lineupSide === "home" ? state.homeLineupStarting : state.awayLineupStarting}
@@ -92,14 +125,14 @@ export default function OverlayPage({
           state.lineupSide === "home" ? state.homeLineupCurrentPlayer : state.awayLineupCurrentPlayer
         }
       />
-      <StandingsScreen
+      <C.StandingsScreen
         visible={state.activeGraphic === "standings"}
         tournamentName={info.match.tournament}
         format={state.standingsFormat}
         rows={state.standingsRows}
         rounds={state.bracketRounds}
       />
-      <StatsScreen
+      <C.StatsScreen
         visible={state.activeGraphic === "stats"}
         homeTeam={homeTeamFull}
         awayTeam={awayTeamFull}
@@ -114,7 +147,7 @@ export default function OverlayPage({
         homeStats={state.homeStats}
         awayStats={state.awayStats}
       />
-      <PreMatchScreen
+      <C.PreMatchScreen
         visible={state.activeGraphic === "prematch"}
         homeTeam={homeTeamFull}
         awayTeam={awayTeamFull}
@@ -123,7 +156,7 @@ export default function OverlayPage({
         date={info.match.date}
         stadium={info.match.stadium}
       />
-      <MatchEventChip
+      <C.MatchEventChip
         timeoutActive={state.matchStatus === "timeout"}
         timeoutTeam={
           state.timeoutSide === "home" ? homeTeamFull : state.timeoutSide === "away" ? awayTeamFull : null

@@ -1,0 +1,441 @@
+/* Ported from scores.html — dimensions, colors, cubic-beziers and
+   transition-delays kept verbatim, repositioned to the top-left corner
+   (standard broadcast soccer-bug placement) instead of top-center. Sizing
+   was calibrated against a reference screenshot: its bug measured ~5.9% of
+   1920x1080 screen height, which is what the original scores.html scale
+   (500x66, ~6.1%) already matched — an earlier 0.68x shrink overshot to
+   ~4.2% and is reverted here. transform/opacity only, so it stays
+   compositor-cheap inside OBS's CEF. */
+
+.scoreboardWrapper {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  width: 500px;
+  height: 66px;
+  z-index: 50;
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.wrapperVisible {
+  pointer-events: auto;
+}
+
+.wrapperHidden {
+  pointer-events: none;
+}
+
+.redCardsContainer {
+  position: absolute;
+  /* Overlaps the green bar's top edge on purpose — z-index below .mainBar
+     means the bar's own background clips the bottom half of each icon, so
+     cards look like they're tucked behind the scoreboard and poking out
+     above it, cut off where they meet the bar (same family of trick as
+     .timePanel/.bottomBar tucking behind .mainBar). */
+  top: -9px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  z-index: 8;
+  padding: 0 16px;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.redCardsContainerVisible {
+  opacity: 1;
+  transition-delay: 0.3s;
+}
+
+.redCardsTeam {
+  display: flex;
+  gap: 4px;
+}
+
+.redCardIcon {
+  width: 12px;
+  height: 16px;
+  background-color: #ff0000;
+  border-radius: 2px;
+}
+
+.timePanel {
+  position: absolute;
+  top: 8px;
+  right: -135px;
+  width: 160px;
+  height: 50px;
+  background-color: #ffffff;
+  border-radius: 0 25px 25px 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 22px;
+  gap: 12px;
+  box-sizing: border-box;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateX(-140px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.timePanelVisible {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.25s;
+}
+
+.periodText {
+  font-size: 16px;
+  font-weight: 800;
+  color: #000000;
+  margin: 0;
+}
+
+/* Two-leg aggregate score — a centered tab poking above the bar. Sits in
+   the only genuinely free real estate above the bug: red cards pin to the
+   left/right edges of that same strip, so a centered tab doesn't compete
+   with them. z-index BELOW .mainBar (same tuck-behind family as
+   .redCardsContainer/.timePanel/.bottomBar) so the bar's top edge clips
+   its bottom ~8px — it reads as anchored behind the bar, not floating in
+   front of it. */
+.aggregateTab {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  min-width: 130px;
+  height: 30px;
+  background-color: #18181a;
+  border-radius: 10px 10px 0 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  box-sizing: border-box;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.aggregateTabVisible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 0.35s;
+}
+
+.aggregateTabLabel {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #67f58b;
+  margin: 0;
+}
+
+.aggregateTabScore {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.timeText {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000000;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.bottomBar {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  width: 464px;
+  /* Taller than scores.html's original 38px, and the pills/dots/label
+     inside are sized up too (see below) — at the old sizes this bar had a
+     lot of unused space, looking sparse relative to its own footprint. */
+  height: 60px;
+  background-color: #18181a;
+  border-radius: 0 0 12px 12px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  box-sizing: border-box;
+  /* The top 16px of this bar sits behind the green main bar (mainBar
+     covers wrapper y:0-66, this bar starts at y:50) — only the bottom 44px
+     is actually visible. Without this padding, align-items: center
+     centers content in the full 60px box, which visually rides high in
+     the 44px visible window and leaves a lopsided gap below. */
+  padding-top: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translate(-50%, -35px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.bottomBarRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+}
+
+/* Satellite badge attached to the fouls/penalties bar's right edge — same
+   "peeking out from behind" trick as .timePanel on the main bar, but
+   colored to read as an EXTENSION of the black bottomBar (same #18181a,
+   same family), not a clone of the white timePanel. */
+.overtimePanel {
+  position: absolute;
+  /* Exact same top/height as .bottomBar (not just an equal value floating
+     elsewhere) so it occupies the identical vertical span — same hidden
+     16px tucked behind .mainBar, same 44px visible window. */
+  top: 50px;
+  left: 470px;
+  width: 160px;
+  height: 60px;
+  background-color: #18181a;
+  border-radius: 0 30px 30px 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-sizing: border-box;
+  padding-top: 16px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.overtimePanelVisible {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.1s;
+}
+
+.overtimePanelLabel {
+  font-size: 14px;
+  font-weight: 800;
+  color: #67f58b;
+  margin: 0;
+}
+
+.overtimePanelTime {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.bottomBarVisible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 0.4s;
+}
+
+.penaltyDotsContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.pDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease;
+}
+
+.pDotScored {
+  background-color: #67f58b;
+  border-color: #67f58b;
+  box-shadow: 0 0 6px #67f58b;
+}
+
+.pDotMissed {
+  background-color: #ff4d4d;
+  border-color: #ff4d4d;
+  box-shadow: 0 0 6px #ff4d4d;
+}
+
+.mainBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #134024;
+  border-radius: 12px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  transform: scale(0.85) translateY(-30px);
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+}
+
+.mainBarVisible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition-delay: 0.3s;
+}
+
+/* flex: 1 (not a fixed width) so both teams get an EQUAL share of the
+   remaining space after the score box — a fixed width fit short names
+   fine but squeezed longer ones against it. */
+.teamGroup {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.teamGroupLeft {
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+.teamGroupRight {
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dotActive {
+  box-shadow: 0 0 8px currentColor;
+}
+
+.logoWrapper {
+  /* mainBar is 66px tall with no vertical padding, so this is sized to
+     leave a deliberate ~9px margin top/bottom rather than maxing out the
+     bar — bigger than the original 36px, which read as undersized next to
+     the bar's own visual weight. */
+  width: 48px;
+  height: 48px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.logoWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.teamName {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.scoreBox {
+  width: 120px;
+  height: 54px;
+  background-color: #0a1c11;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.scoreNum {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 700;
+  width: 50px;
+  text-align: center;
+  line-height: 1;
+}
+
+.scoreDivider {
+  width: 1px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+@keyframes goalImpact {
+  0% {
+    transform: scale(1);
+    background-color: #0a1c11;
+  }
+  30% {
+    transform: scale(1.18);
+    background-color: #1f5932;
+    box-shadow: 0 0 20px #67f58b;
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    background-color: #0a1c11;
+    box-shadow: none;
+  }
+}
+
+.scoreBoxPulse {
+  animation: goalImpact 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.textLabelCenter {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.pillsContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.foulPill {
+  width: 24px;
+  height: 9px;
+  background-color: #3a3b3f;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.foulPillActive {
+  box-shadow: 0 0 6px currentColor;
+}

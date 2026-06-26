@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body) return Response.json({ error: "Invalid body" }, { status: 400 });
 
-  const { tournament, matchday, stadium, date, homeTeam: home, awayTeam: away, homeTeamId, awayTeamId } = body;
+  const { tournament, matchday, stadium, date, homeTeam: home, awayTeam: away, homeTeamId, awayTeamId, overlayTemplate } = body;
 
   if (!tournament || !matchday || !stadium || !date) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
@@ -106,6 +106,7 @@ export async function POST(request: Request) {
     date: String(date),
     homeTeamId: resolvedHomeId,
     awayTeamId: resolvedAwayId,
+    overlayTemplate: overlayTemplate === "classic" ? "classic" : "redesigned",
   };
 
   const { insertedId: matchId } = await db.collection("matches").insertOne(matchDoc);
