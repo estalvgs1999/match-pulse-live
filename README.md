@@ -1,143 +1,273 @@
 # MatchPulse Live
 
-Broadcast-grade, low-latency sports overlay system for OBS/vMix. Built with Next.js
-(App Router), MongoDB, and the Pusher Channels protocol. Two ways to run it: against
-cloud services (MongoDB Atlas + Pusher Channels) via `npm run dev`, or **fully locally**
-with `docker compose` — no cloud accounts needed for that path.
+> **Live broadcast control system for football & futsal.** A web-based operator console that drives real-time scoreboard graphics captured directly by OBS as a browser source — no plugins, no SDI routing, no capture cards.
 
-This is **Phase 1 (núcleo)**: the Main Bug + HT/FT overlay, the drift-corrected clock,
-the Live Console operator panel, and crash-resilient state rehydration. See
-`/Users/ealvarado/.claude-personal/plans/expressive-orbiting-metcalfe.md` for the full
-plan and what's deliberately out of scope for this phase.
+---
 
-## Architecture at a glance
+## Overview
 
-- **`/overlay/[matchId]`** — what you load as an OBS/vMix Browser Source. Transparent,
-  read-only, no auth. Hydrates over REST on load, then stays live via Pusher.
-- **`/control/[matchId]`** — the operator console. Password-gated.
-- **`/login`** — single shared password gate for the control console.
-- **MongoDB** — `teams`, `matches` (static data) and `matchStates` (the live, mutable
-  per-match document that the overlay and console both read).
-- **Pusher Channels** (or a self-hosted equivalent — see Option A) — the realtime bus.
-  The control panel calls `PATCH /api/matches/[id]/state`, which writes to Mongo and
-  broadcasts the new state; the overlay and console both just listen.
+MatchPulse Live runs two independent surfaces simultaneously over a single web server:
 
-## Option A: fully local, via Docker (no accounts needed)
+| Surface | URL | Purpose |
+|---------|-----|---------|
+| **Control Panel** | `/control/[matchId]` | Operator manages clock, score, cards, graphics |
+| **Broadcast Overlay** | `/overlay/[matchId]` | Transparent graphics for OBS Browser Source |
+
+The operator triggers a graphic → the server PATCHes MongoDB → fires a Pusher event → the overlay reacts within ~100 ms, before the next broadcast frame. The clock is **server-anchored**: the overlay computes elapsed time from `periodStartServerTs` so WebSocket reconnects and OBS reloads never cause drift.
+
+---
+
+## Features
+
+### Control Panel
+- **Live clock** — start / pause / sync to any time / restart; overtime is calculated automatically
+- **Score & cards** — goals, yellow cards, red cards, and fouls counter per team
+- **Match phases** — Pre-match → 1st Half → Half Time → 2nd Half → Full Time → Extra Time → Penalties
+- **Graphic selector** — scorebug, HT/FT card, lineups, standings, stats, pre-match overlay
+- **Penalty shootout** — per-kick scored/missed tracking; the visible window follows sudden death beyond round 5
+- **Goal scorer** — pick a player from the roster; name is appended to the scorer strip on the overlay
+- **Lineup editor** — configure starting five, captain, and spotlight player per team
+- **Standings editor** — build a live league table or bracket
+- **Stats editor** — possession, corners, shots on/off target
+- **Match settings** — period duration, clock direction, aggregate score for cup ties
+- **Timeout & replay chips** — lower-third graphics for timeouts and replay moments
+- **Fully responsive** — works on desktop, tablet, and mobile (control from pitch-side on a phone)
+
+### Broadcast Overlay
+- **Transparent background** — composites over live video in OBS with no extra tools
+- **Three visual templates** — switch per match at creation time; add new ones with a single command
+- **Drift-free clock** — server-anchored; survives OBS reloads and network hiccups
+- **Animated graphics** — smooth enter/exit transitions on every overlay element
+- **Intro scan** — lineup card spotlights each player automatically on reveal
+- **Multi-operator** — all control consoles share the same live state via Pusher
+
+### Dashboard & Team Database
+- **Project list** — all matches with live / scheduled / ended status badges
+- **New match wizard** — select existing teams or create inline; choose template with live preview
+- **Team editor** — name, code, colors, logo upload; full roster with numbers, positions, and portraits
+- **OBS connection modal** — one-click copy of the overlay URL per match
+
+---
+
+## Overlay Templates
+
+| Template | Key | Visual style |
+|----------|-----|-------------|
+| **Rediseñado** | `redesigned` | Obsidian dark palette; team-color accent rings; adaptive tints |
+| **Clásico** | `classic` | Broadcast green background; clean rectangular scorebug |
+| **Champions** | `champions` | UCL-inspired; deep navy `#001233`; cyan `#00B4FF` accent; two-section split widget |
+
+Add custom themes with `/new-overlay-theme` (see [Adding a Theme](#adding-a-theme)).
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 — App Router, `src/` directory |
+| Language | TypeScript 5 (strict) |
+| Styling — control panel | Tailwind CSS v4 (`@import "tailwindcss"` + `@theme {}`) |
+| Styling — overlay | CSS Modules per component, no Tailwind |
+| Validation | Zod v4 — all models and API payloads |
+| Database | MongoDB 7 via `mongodb` driver (no ORM) |
+| Real-time | Pusher Channels (cloud) |
+| Animation | framer-motion |
+| Runtime | Node 22 — `next build` → standalone output |
+| Container | Docker multi-stage + Docker Compose |
+
+---
+
+## Quick Start — Docker
+
+### Prerequisites
+- Docker + Docker Compose
+- [Pusher Channels](https://pusher.com/channels) — free tier (100 concurrent connections is plenty)
+- MongoDB 7 — Atlas free tier or local
+
+### 1 — Clone and configure
 
 ```bash
-docker compose up --build
+git clone https://github.com/craving-ealvarado/match-pulse-live.git
+cd match-pulse-live
+cp .env.example .env
 ```
 
-This starts three containers — `mongo` (MongoDB), `soketi` (a self-hosted,
-Pusher-protocol-compatible WebSocket server — same wire protocol Pusher Channels uses,
-so the app code doesn't know the difference), and `app` (this Next.js app) — wired
-together with fixed local dev credentials baked into `docker-compose.yml`. Nothing to
-fill in.
+Edit `.env` with your credentials:
 
-Then seed the local database (only needed once, or after a `docker compose down -v`):
+```env
+# MongoDB
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/matchpulse
+MONGODB_DB=matchpulse
+
+# Pusher Channels
+PUSHER_APP_ID=your_app_id
+PUSHER_KEY=your_key
+PUSHER_SECRET=your_secret
+PUSHER_CLUSTER=us2
+
+NEXT_PUBLIC_PUSHER_KEY=your_key          # same key, browser-exposed
+NEXT_PUBLIC_PUSHER_CLUSTER=us2           # same cluster, browser-exposed
+
+# Single shared password for /control
+CONTROL_PASSWORD=changeme
+```
+
+### 2 — Build and run
+
+```bash
+docker compose up -d --build
+```
+
+> `NEXT_PUBLIC_*` variables are inlined into the client bundle at **build time**. Changing Pusher credentials requires a rebuild: `docker compose up -d --build app`.
+
+### 3 — Open
+
+| | URL |
+|-|-----|
+| Dashboard | http://localhost:4000/dashboard |
+| Login | http://localhost:4000/login |
+
+### 4 — Seed demo data (optional)
 
 ```bash
 npm run seed:docker
 ```
 
-Open:
-- Control: `http://localhost:3000/control/<matchId>` (password printed isn't real —
-  it's `devpassword`, or whatever you set `CONTROL_PASSWORD` to in your shell env)
-- Overlay: `http://localhost:3000/overlay/<matchId>`
+---
 
-`<matchId>` is printed by the seed script. Data persists in the `mongo_data` Docker
-volume across restarts; `docker compose down -v` wipes it.
-
-If port 3000 is already taken by something else on your machine, override it without
-touching `docker-compose.yml`:
+## Development — Hot Reload
 
 ```bash
-APP_PORT=3001 docker compose up --build
+cp .env.example .env.local    # fill in your credentials
+
+# Docker stack with live reload
+npm run docker:dev
+
+# Rebuild dev image after changing package.json
+npm run docker:dev:build
 ```
 
-(Only the `app` service's host port changes — `mongo` and `soketi` are unaffected, and
-the browser still reaches soketi on `localhost:6001` regardless.)
-
-If you want to point the Docker stack at real cloud Pusher/Mongo instead of the bundled
-local ones, edit the hardcoded values in `docker-compose.yml`'s `app` and `args`
-sections — they're intentionally inline there rather than env-file-driven, so the
-default `docker compose up` always works standalone.
-
-## Option B: cloud services, via `npm run dev`
-
-### 1. Create your accounts (free tier)
-
-#### MongoDB Atlas
-
-1. Go to https://www.mongodb.com/cloud/atlas/register and create a free account.
-2. Create a new **Project**, then build a **free M0 cluster** (any region close to you).
-3. Under **Database Access**, create a database user with a username/password (not
-   OAuth) — you'll need these in the connection string.
-4. Under **Network Access**, add an IP access entry. For local development, "Allow
-   access from anywhere" (`0.0.0.0/0`) is fine; tighten this before going to production.
-5. Once the cluster is up, click **Connect → Drivers**, copy the connection string. It
-   looks like `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority`.
-6. Paste it into `.env.local` as `MONGODB_URI`. Leave `MONGODB_DB=matchpulse` — the app
-   creates collections automatically on first write, no manual schema setup needed.
-
-#### Pusher Channels
-
-1. Go to https://dashboard.pusher.com/accounts/sign_up and create a free account.
-2. Create a new **Channels app** (not Beams, not Chatkit). Pick any cluster close to
-   you (e.g. `us2`, `eu`).
-3. Open the app's **App Keys** tab. You'll see `app_id`, `key`, `secret`, `cluster`.
-4. Fill in `.env.local`:
-   - `PUSHER_APP_ID`, `PUSHER_KEY`, `PUSHER_SECRET`, `PUSHER_CLUSTER` — from App Keys.
-   - `NEXT_PUBLIC_PUSHER_KEY` — same value as `PUSHER_KEY`.
-   - `NEXT_PUBLIC_PUSHER_CLUSTER` — same value as `PUSHER_CLUSTER`.
-   (The `NEXT_PUBLIC_` versions are what the browser uses; they're the same key, just
-   re-exposed under the prefix Next.js requires for client-side env vars.)
-
-#### Control password
-
-Pick any password and set it as `CONTROL_PASSWORD` in `.env.local`. This is the single
-shared password the operator console (`/login`) checks — there's no per-user account
-system in this phase.
-
-#### Vercel Blob (optional for now)
-
-Used in a future phase for uploading team logos. You can leave `BLOB_READ_WRITE_TOKEN`
-blank for now — team logos work fine as plain URLs (or no logo at all, which falls back
-to a default crest).
-
-### 2. Install and seed
+Or run fully local (Node 22 + MongoDB + Pusher in `.env.local`):
 
 ```bash
 npm install
-cp .env.example .env.local   # if you haven't already — then fill in the values above
-npm run seed                 # creates 2 demo teams + 1 match in MongoDB
+npm run dev      # http://localhost:3000
+npm run seed     # seed demo data against .env.local MongoDB
 ```
 
-The seed script prints the match ID and ready-to-use overlay/control URLs.
+---
 
-### 3. Run it
+## OBS Integration
+
+1. Open the dashboard → click the monitor icon on a match card
+2. Copy the overlay URL
+3. In OBS, add a **Browser Source**:
+   - URL: paste the overlay URL
+   - Width: `1920`, Height: `1080`
+   - Custom CSS: leave empty (background is transparent)
+4. Place the browser source above your video capture layer
+
+### Remote access via ngrok
 
 ```bash
-npm run dev
+ngrok http 4000 --request-header-add "ngrok-skip-browser-warning: any"
 ```
 
-- Open the **Control URL** printed by the seed script, log in with your
-  `CONTROL_PASSWORD`, and start clicking around (score, fouls, clock, HT/FT).
-- Open the **Overlay URL** in another tab (or as an OBS Browser Source, 1920x1080,
-  transparent background) and watch it update live.
+Use the ngrok HTTPS URL in OBS. HMR WebSocket errors in the console are cosmetic and irrelevant to the overlay.
 
-### Verifying resilience
+---
 
-- **Rehydration**: with the clock running, reload the overlay tab. It should come back
-  showing the exact same score/fouls/time — this is what happens automatically if OBS's
-  browser source crashes or the broadcast PC loses power.
-- **Drift**: leave the clock running for a few minutes and compare it to a real
-  stopwatch. It's anchored to the server's clock, not a local interval, so it shouldn't
-  drift even under network hiccups.
+## Environment Variables
 
-## What's not in this phase
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGODB_URI` | ✓ | MongoDB connection string |
+| `MONGODB_DB` | ✓ | Database name (default: `matchpulse`) |
+| `PUSHER_APP_ID` | ✓ | Pusher Channels App ID |
+| `PUSHER_KEY` | ✓ | Pusher key (server-side) |
+| `PUSHER_SECRET` | ✓ | Pusher secret |
+| `PUSHER_CLUSTER` | ✓ | Pusher region (e.g. `us2`) |
+| `NEXT_PUBLIC_PUSHER_KEY` | ✓ | Same key, baked into client bundle |
+| `NEXT_PUBLIC_PUSHER_CLUSTER` | ✓ | Same cluster, baked into client bundle |
+| `CONTROL_PASSWORD` | ✓ | Operator login password |
+| `PUSHER_HOST` | — | Self-hosted Pusher-protocol server (e.g. soketi) |
+| `PUSHER_PORT` | — | Self-hosted server port |
+| `NEXT_PUBLIC_PUSHER_HOST` | — | Browser-facing self-hosted host |
+| `NEXT_PUBLIC_PUSHER_PORT` | — | Browser-facing self-hosted port |
 
-Match Intro, Lineups, the lower-third chips (Goal/Card/Timeout/Coach/Replay), the SVG
-jersey generator, and the rest of the admin screens (Dashboard, Team Database, Overlay
-Manager, Data Streams) are designed but not built yet — see the plan file for the full
-roadmap.
+---
+
+## Project Structure
+
+```
+src/
+  app/
+    layout.tsx                    # Root layout — Geist + Montserrat fonts
+    globals.css                   # Tailwind v4 + Obsidian design tokens
+    page.tsx                      # Redirects authenticated users to dashboard
+    login/page.tsx                # Operator login
+    dashboard/                    # Match list, new match wizard, team management
+    control/[matchId]/            # Live operator console
+    overlay/[matchId]/            # Broadcast graphics (transparent background)
+    api/                          # REST API routes
+  components/
+    control/                      # Clock, TeamPanel, MatchFlow, modals…
+    overlay/
+      *.tsx / *.module.css        # Redesigned template (default)
+      classic/                    # Classic template
+      champions/                  # Champions template
+    shared/                       # Default logo and portrait (base64 fallback)
+  hooks/
+    useMatchState.ts              # Pusher subscription + PATCH helper
+    useMatchClock.ts              # Drift-corrected tick
+    useMatchInfo.ts               # Static match + team data
+    useServerOffset.ts            # Client/server clock delta
+    usePlayerEventChip.ts         # Goal/card chip with auto-dismiss
+  lib/
+    mongodb.ts                    # Singleton MongoDB connection
+    pusher-server.ts / client.ts  # Pusher clients
+    clock-display.ts              # Primary + overtime seconds derivation
+    format.ts                     # Clock formatting, penalty window
+  models/
+    Match.ts                      # Zod: match metadata + OverlayTemplate enum
+    Team.ts                       # Zod: team + roster
+    MatchState.ts                 # Zod: full live state + patch schema
+```
+
+---
+
+## Adding a Theme
+
+Use the built-in slash command in your Claude Code session:
+
+```
+/new-overlay-theme "Theme Name" brief description of the style
+```
+
+Attach one or more reference images. The command will:
+1. Extract color palette, typography, and shape language from the images
+2. Generate all 16 component files in `src/components/overlay/{key}/`
+3. Wire the new template into the Zod schema, API, overlay page, and creation wizard
+
+All behavior (clock, scoring, animations, lineup scan, aggregate score) is inherited from the Champions template — only the CSS changes.
+
+---
+
+## Architecture Notes
+
+**Clock** — `periodStartServerTs` is always stamped by the API route, never the client. The overlay derives elapsed time at render: `now − periodStartServerTs + baseSeconds`. This eliminates drift from WebSocket reconnects, OBS reloads, or multi-operator edits.
+
+**State flow** — `PATCH /api/matches/[id]/state` → MongoDB upsert → Pusher event → all subscribers replace state wholesale. No optimistic updates; the PATCH response is authoritative.
+
+**Overlay transparency** — the overlay page root has no `background`. OBS captures it over video. Any background on the root breaks compositing.
+
+**Schema self-healing** — `MatchStateSchema.parse()` fills defaults on every read. Documents from older schema versions self-heal on load without a migration script.
+
+**`NEXT_PUBLIC_*` are build-time constants** — changing Pusher client config requires a Docker image rebuild, not just a container restart.
+
+---
+
+## License
+
+MIT
