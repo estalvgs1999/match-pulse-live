@@ -387,7 +387,7 @@ export function TeamEditorClient({ teamId }: { teamId: string }) {
           title="Recortar foto del jugador"
           cropShape="round"
           outputSize={300}
-          outputFormat="jpeg"
+          outputFormat="png"
           onConfirm={handlePortraitCropConfirm}
           onCancel={handlePortraitCropCancel}
         />

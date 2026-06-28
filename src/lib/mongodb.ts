@@ -13,11 +13,17 @@ function createClientPromise(): Promise<MongoClient> {
   return client.connect();
 }
 
-// Cached on `global` so warm serverless invocations (and dev HMR reloads)
-// reuse the same connection instead of opening a new one per request.
+// Cached on `global` so warm invocations reuse the same connection.
+// On failure the cache is cleared so the next request retries instead of
+// replaying the same rejected promise forever.
 export async function getDb(): Promise<Db> {
   const dbName = process.env.MONGODB_DB ?? "matchpulse";
   global._mongoClientPromise ??= createClientPromise();
-  const client = await global._mongoClientPromise;
-  return client.db(dbName);
+  try {
+    const client = await global._mongoClientPromise;
+    return client.db(dbName);
+  } catch (err) {
+    global._mongoClientPromise = undefined;
+    throw err;
+  }
 }
